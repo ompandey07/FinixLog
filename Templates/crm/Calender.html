@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EASY LOGS</title>
+    <link rel="shortcut icon" href="/static/images/Logo.png" type="image/x-icon">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+    href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css"
+    rel="stylesheet"
+/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+        }
+        .app-container {
+            max-width: 1450px;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .app-header {
+            color: black;
+            display: flex;
+            padding: 15px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.178);
+        }
+        .calendar-container {
+            display: flex;
+            height: calc(100vh - 64px);
+        }
+        .main-calendar {
+            flex-grow: 1;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+        .side-panel {
+            width: 350px;
+            background-color: #f8fafc;
+            border-left: 1px solid #e2e8f0;
+            padding: 1rem;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background-color: #e2e8f0;
+        }
+        .calendar-day {
+            background-color: white;
+            min-height: 100px;
+            padding: 0.5rem;
+            transition: all 0.2s ease;
+        }
+        .calendar-day:hover {
+            background-color: #f1f5f9;
+        }
+        .calendar-day-header {
+            font-weight: bold;
+            text-align: center;
+            padding: 0.5rem;
+            background-color: #f1f5f9;
+        }
+        .event-item {
+            background-color: #4a90e2;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            margin-top: 0.25rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .event-item:hover {
+            background-color: #3182ce;
+        }
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        .btn-primary {
+            background-color: #4a90e2;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #3182ce;
+        }
+        .btn-secondary {
+            background-color: #e2e8f0;
+            color: #4a5568;
+        }
+        .btn-secondary:hover {
+            background-color: #cbd5e0;
+        }
+        .modal {
+            background-color: rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        .input-field {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <a href="/admin_dashboard">
+                <img
+                src="/static/images/Logo.png"
+                alt="logo"
+                style="max-width: 50px; height: 40px;"
+              />
+            </a>
+            <span class="text-2xl font-bold px-3 ">EASY LOGS CALENDAR</span>
+        </header>
+        <div class="calendar-container">
+            <main class="main-calendar">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <button id="prevMonth" class="btn btn-secondary mr-2"><i class="ri-arrow-left-s-line"></i></button>
+                        <button id="nextMonth" class="btn btn-secondary"><i class="ri-arrow-right-s-line"></i></button>
+                    </div>
+                    <h2 id="currentMonthYear" class="text-xl font-semibold"></h2>
+                    <button id="addEventBtn" class="btn btn-primary"><i class="ri-add-large-line"></i> Add Event</button>
+                </div>
+                <div id="calendarGrid" class="calendar-grid">
+                    <!-- Calendar days will be inserted here by JavaScript -->
+                </div>
+            </main>
+            <aside class="side-panel">
+                <h3 class="text-lg font-semibold mb-4">Mini Calendar</h3>
+                <div id="miniCalendar" class="w-full mb-4"></div>
+                <h3 class="text-lg font-semibold mt-3">Upcoming Events</h3>
+                <div id="upcomingEvents">
+                    <!-- Upcoming events will be inserted here by JavaScript -->
+                     
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Event Modal -->
+    <div id="eventModal" class="modal fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center">
+        <div class="modal-content bg-white p-6 rounded-lg w-96">
+            <div class="flex justify-between items-center mb-4">
+                <h2 id="modalTitle" class="text-xl font-bold">New Event</h2>
+                <button id="closeModal" class="text-gray-500"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="eventForm">
+                <input type="hidden" id="eventId">
+                <div class="mb-4">
+                    <label for="eventTitle" class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                    <input type="text" id="eventTitle" class="input-field" placeholder="Enter event title">
+                </div>
+                <div class="mb-4">
+                    <label for="eventDateRange" class="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
+                    <input type="text" id="eventDateRange" class="input-field" placeholder="Select date range">
+                </div>
+                <div class="mb-4">
+                    <label for="eventDescription" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea id="eventDescription" class="input-field" rows="3" placeholder="Enter event description"></textarea>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" id="deleteEvent" class="btn btn-secondary">Delete</button>
+                    <button type="submit" id="saveEvent" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const calendarGrid = document.getElementById('calendarGrid');
+        const currentMonthYearElement = document.getElementById('currentMonthYear');
+        const eventModal = document.getElementById('eventModal');
+        const eventForm = document.getElementById('eventForm');
+        const eventTitleInput = document.getElementById('eventTitle');
+        const eventDateRangeInput = document.getElementById('eventDateRange');
+        const eventDescriptionInput = document.getElementById('eventDescription');
+        const saveEventBtn = document.getElementById('saveEvent');
+        const deleteEventBtn = document.getElementById('deleteEvent');
+        const closeModalBtn = document.getElementById('closeModal');
+        const addEventBtn = document.getElementById('addEventBtn');
+        const prevMonthBtn = document.getElementById('prevMonth');
+        const nextMonthBtn = document.getElementById('nextMonth');
+
+        let currentDate = new Date();
+        let events = JSON.parse('{{ events_json|safe }}');
+        let currentEditingEvent = null;
+
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+
+            currentMonthYearElement.textContent = new Date(year, month).toLocaleString('default', { month: 'long', year: 'numeric' });
+
+            calendarGrid.innerHTML = '';
+
+            const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            dayNames.forEach(day => {
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'calendar-day-header';
+                dayHeader.textContent = day;
+                calendarGrid.appendChild(dayHeader);
+            });
+
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startingDay = firstDay.getDay();
+
+            for (let i = 0; i < startingDay; i++) {
+                calendarGrid.appendChild(document.createElement('div'));
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.innerHTML = `<div class="font-bold">${day}</div>`;
+
+                const dayEvents = events.filter(event => {
+                    const eventStart = new Date(event.start);
+                    const eventEnd = new Date(event.end);
+                    const currentDay = new Date(dateString);
+                    return currentDay >= eventStart && currentDay <= eventEnd;
+                });
+
+                dayEvents.forEach(event => {
+                    const eventElement = document.createElement('div');
+                    eventElement.className = 'event-item';
+                    eventElement.textContent = event.title;
+                    eventElement.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        openEventModal(event);
+                    });
+                    dayElement.appendChild(eventElement);
+                });
+
+                dayElement.addEventListener('click', () => openEventModal(null, dateString));
+                calendarGrid.appendChild(dayElement);
+            }
+
+            renderUpcomingEvents();
+        }
+
+        function renderUpcomingEvents() {
+            const upcomingEventsContainer = document.getElementById('upcomingEvents');
+            upcomingEventsContainer.innerHTML = '';
+
+            const today = new Date();
+            const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+            const upcomingEvents = events.filter(event => {
+                const eventStart = new Date(event.start);
+                return eventStart >= today && eventStart <= nextWeek;
+            });
+
+            upcomingEvents.sort((a, b) => new Date(a.start) - new Date(b.start));
+
+            upcomingEvents.forEach(event => {
+                const eventElement = document.createElement('div');
+                eventElement.className = 'mb-2 p-2 bg-white rounded shadow';
+                eventElement.innerHTML = `
+                    <div class="font-semibold">${event.title}</div>
+                    <div class="text-sm text-gray-600">${new Date(event.start).toLocaleDateString()}</div>
+                `;
+                upcomingEventsContainer.appendChild(eventElement);
+            });
+        }
+
+        function openEventModal(event = null, date = null) {
+            const modalTitle = document.getElementById('modalTitle');
+            const eventId = document.getElementById('eventId');
+
+            if (event) {
+                modalTitle.textContent = 'Edit Event';
+                eventId.value = event.id;
+                eventTitleInput.value = event.title;
+                eventDateRangeInput.value = `${event.start} to ${event.end}`;
+                eventDescriptionInput.value = event.description;
+                deleteEventBtn.style.display = 'block';
+                currentEditingEvent = event;
+            } else {
+                modalTitle.textContent = 'New Event';
+                eventId.value = '';
+                eventTitleInput.value = '';
+                eventDateRangeInput.value = date || '';
+                eventDescriptionInput.value = '';
+                deleteEventBtn.style.display = 'none';
+                currentEditingEvent = null;
+            }
+
+            eventModal.classList.remove('hidden');
+        }
+
+        function closeEventModal() {
+            eventModal.classList.add('hidden');
+            eventForm.reset();
+        }
+
+        function saveEvent(e) {
+            e.preventDefault();
+            const eventId = document.getElementById('eventId').value;
+            const title = eventTitleInput.value.trim();
+            const dateRange = eventDateRangeInput.value;
+            const description = eventDescriptionInput.value.trim();
+
+            if (title && dateRange) {
+                const [start, end] = dateRange.split(" to ");
+                const eventData = {
+                    title: title,
+                    start: start,
+                    end: end || start,
+                    description: description
+                };
+
+                if (eventId) {
+                    // Update existing event
+                    fetch(`{% url "update_event" 0 %}`.replace('0', eventId), {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify(eventData)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            const index = events.findIndex(e => e.id === parseInt(eventId));
+                            if (index !== -1) {
+                                events[index] = { ...events[index], ...eventData };
+                            }
+                            renderCalendar();
+                            closeEventModal();
+                        } else {
+                            alert('Failed to update event');
+                        }
+                    });
+                } else {
+                    // Add new event
+                    fetch('{% url "add_event" %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json','X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify(eventData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    eventData.id = data.id;
+                    events.push(eventData);
+                    renderCalendar();
+                    closeEventModal();
+                } else {
+                    alert('Failed to save event');
+                }
+            });
+        }
+    }
+}
+
+function deleteEvent() {
+    if (currentEditingEvent) {
+        fetch(`{% url "delete_event" 0 %}`.replace('0', currentEditingEvent.id), {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                events = events.filter(e => e.id !== currentEditingEvent.id);
+                renderCalendar();
+                closeEventModal();
+            } else {
+                alert('Failed to delete event');
+            }
+        });
+    }
+}
+
+function navigateMonth(direction) {
+    currentDate.setMonth(currentDate.getMonth() + direction);
+    renderCalendar();
+    miniCalendarInstance.setDate(currentDate);
+}
+
+// Event listeners
+saveEventBtn.addEventListener('click', saveEvent);
+deleteEventBtn.addEventListener('click', deleteEvent);
+closeModalBtn.addEventListener('click', closeEventModal);
+addEventBtn.addEventListener('click', () => openEventModal(null, new Date().toISOString().split('T')[0]));
+prevMonthBtn.addEventListener('click', () => navigateMonth(-1));
+nextMonthBtn.addEventListener('click', () => navigateMonth(1));
+
+// Initialize Flatpickr for the event date range input
+flatpickr("#eventDateRange", {
+    mode: "range",
+    dateFormat: "Y-m-d",
+    minDate: "today",
+    static: true
+});
+
+// Initialize mini calendar
+const miniCalendarInstance = flatpickr("#miniCalendar", {
+    inline: true,
+    dateFormat: "Y-m-d",
+    onChange: function (selectedDates, dateStr, instance) {
+        currentDate = selectedDates[0];
+        renderCalendar();
+    }
+});
+
+// Initial render
+renderCalendar();
+</script>
+</body>
+</html>

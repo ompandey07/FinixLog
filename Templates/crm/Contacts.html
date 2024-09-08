@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EASY CONTACTS</title>
+  <link rel="shortcut icon" href="/static/images/Logo.png" type="image/x-icon">
+  <link
+    href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <style>
+    body {
+      background-color: #f0f4f8;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding-top: 60px;
+      padding-bottom: 40px;
+      cursor: pointer;
+    }
+    .sticky-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background-color: #ffffff;
+      z-index: 1000;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 10px 0;
+    }
+    .sticky-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: #ffffff;
+      z-index: 1000;
+      box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      font-size: 12px;
+    }
+    .todo-container {
+      max-width: 1400px;
+      margin: 30px auto;
+      background-color: #ffffff;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+    }
+    .todo-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      grid-gap: 25px;
+      margin-top: 30px;
+    }
+    .todo-item {
+      transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+      border: 1px solid rgba(0, 0, 0, 0.171);
+      border-radius: 5px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .todo-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+    }
+    .card-body {
+      background-color: #ffffff;
+      padding: 20px;
+    }
+    .card-title {
+      color: #2c3e50;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+    .card-text {
+      color: #34495e;
+    }
+    .search-bar {
+      position: relative;
+      margin-bottom: 25px;
+    }
+    .search-input {
+      width: 100%;
+      padding: 15px 20px;
+      border: none;
+      border-radius: 30px;
+      background-color: #f0f4f8;
+      font-size: 16px;
+      transition: box-shadow 0.3s ease-in-out;
+    }
+    .search-input:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+    }
+    .search-icon {
+      position: absolute;
+      top: 50%;
+      right: 20px;
+      transform: translateY(-50%);
+      color: #3498db;
+      font-size: 20px;
+    }
+    #nav-logo {
+      max-width: 325px;
+      max-height: 55px;
+    }
+    .add-contact-btn {
+      position: fixed;
+      bottom: 40px;
+      right: 30px;
+      background-color: #3498db;
+      color: #ffffff;
+      border: none;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      font-size: 24px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
+    }
+    .add-contact-btn:hover {
+      background-color: #2980b9;
+      transform: scale(1.1);
+    }
+    .modal-content {
+      border-radius: 15px;
+      overflow: hidden;
+    }
+    .modal-header {
+      background-color: #3498db;
+      color: #ffffff;
+      border-bottom: none;
+    }
+    .modal-body {
+      padding: 30px;
+    }
+    .form-group label {
+      font-weight: 600;
+      color: #2c3e50;
+    }
+    .form-control {
+      border-radius: 8px;
+      border: 1px solid #bdc3c7;
+      padding: 12px 15px;
+      transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    }
+    .form-control:focus {
+      border-color: #3498db;
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+    }
+    .form-btn {
+      background-color: #3498db;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 20px;
+      font-weight: 600;
+      transition: background-color 0.3s ease-in-out;
+    }
+    .form-btn:hover {
+      background-color: #2980b9;
+    }
+    .card-icons {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+    .card-icon {
+      font-size: 18px;
+      margin-left: 10px;
+      cursor: pointer;
+      transition: color 0.3s ease-in-out;
+    }
+    .edit-icon {
+      color: #f39c12;
+    }
+    .edit-icon:hover {
+      color: #d35400;
+    }
+    .delete-icon {
+      color: #e74c3c;
+    }
+    .delete-icon:hover {
+      color: #c0392b;
+    }
+    .card-text i {
+      width: 25px;
+      text-align: center;
+      margin-right: 5px;
+    }
+    .fa-phone { color: #3498db; }
+    .fa-envelope { color: #e74c3c; }
+    .fa-map-marker-alt { color: #2ecc71; }
+    .fa-globe { color: #9b59b6; }
+    .fa-briefcase { color: #f39c12; }
+
+    #delete{
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <header class="sticky-header">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center">
+        <a class="navbar-brand" href="/admin_dashboard">
+          <img src="/static/images/Logo.png" alt="" id="nav-logo">
+        </a>
+        <h2 class="m-0" style="color: #3498db"><i class="ri-contacts-book-2-fill"></i> EASY LOGS CONTACTS</h2>
+      </div>
+    </div>
+  </header>
+
+  <div class="container todo-container">
+    <div class="search-bar animate__animated animate__fadeInDown">
+      <input type="text" class="search-input" id="searchInput" placeholder="Search by Party Name">
+      <i class="fas fa-search search-icon"></i>
+    </div>
+
+    <div class="todo-list animate__animated animate__fadeInUp" id="todoList">
+
+
+      {% for data in contacts %}
+      <div class="card todo-item">
+        <div class="card-body">
+          <div class="card-icons">
+            <i class="fas fa-edit card-icon edit-icon" data-toggle="modal" data-target="#editModal" data-id="{{data.id}}" data-name="{{data.contact_name}}" data-contact="{{data.contact_number}}" data-email="{{data.email}}" data-address="{{data.address}}" data-website="{{data.website}}" data-designation="{{data.designaton}}"></i>
+            <a href="{% url "delete" data.id %}" id="delete" ><i class="fas fa-trash card-icon delete-icon"></i></a>
+          </div>
+          <h5 class="card-title"><i class="ri-user-follow-line"></i> {{data.contact_name}}</h5>
+          <p class="card-text">
+            <i class="fas fa-phone"></i> {{data.contact_number}}<br>
+            <i class="far fa-envelope"></i> {{data.email}}<br>
+            <i class="fas fa-map-marker-alt"></i> {{data.address}}<br>
+            <i class="fas fa-globe"></i> {{data.website}}<br>
+            <i class="fas fa-briefcase"></i> {{data.designaton}}
+          </p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="sticky-footer">
+    <div>&copy; EASY LOGS</div>
+  </div>
+
+  <!-- Add New Contact Modal -->
+  <button class="add-contact-btn" data-toggle="modal" data-target="#addModal"><i class="fas fa-plus"></i></button>
+
+  <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addModalLabel"><i class="ri-contacts-book-2-fill"></i> Add New Contact</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form method="POST">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="contact_name"><i class="fas fa-user"></i> Contact Name</label>
+                  <input type="text" class="form-control" id="contact_name" name="contact_name" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="contact_number"><i class="fas fa-phone"></i> Contact</label>
+                  <input type="text" class="form-control" id="contact_number" name="contact_number" required>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="email"><i class="far fa-envelope"></i> Email</label>
+                  <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="address"><i class="fas fa-map-marker-alt"></i> Address</label>
+                  <input type="text" class="form-control" id="address" name="address" required>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="website"><i class="fas fa-globe"></i> Website</label>
+                  <input type="text" class="form-control" id="website" name="website" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="designation"><i class="fas fa-briefcase"></i> Designation</label>
+                  <input type="text" class="form-control" id="designation" name="designaton" required>
+                </div>
+              </div>
+            </div>
+            <button type="submit" class="btn form-btn">Add Contact</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Contact Modal -->
+  <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editModalLabel">Edit Contact</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="editForm" method="POST">
+            {% csrf_token %}
+            <input type="hidden" id="edit-contact-id" name="contact_id">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="edit-contact-name"><i class="fas fa-user"></i> Contact Name</label>
+                  <input type="text" class="form-control" value="{{value.contact_name}}"  id="edit-contact-name" name="contact_name" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="edit-contact-number"><i class="fas fa-phone"></i> Contact</label>
+                  <input type="text" class="form-control" value="{{value.contact_number}}"  id="edit-contact-number" name="contact_number" required>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="edit-email"><i class="far fa-envelope"></i> Email</label>
+                  <input type="email" class="form-control" value="{{value.email}}"  id="edit-email" name="email" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="edit-address"><i class="fas fa-map-marker-alt"></i> Address</label>
+                  <input type="text" class="form-control" value="{{value.address}}"  id="edit-address" name="address" required>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="edit-website"><i class="fas fa-globe"></i> Website</label>
+                  <input type="text" class="form-control" value="{{value.website}}"  id="edit-website" name="website" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="edit-designation"><i class="fas fa-briefcase"></i> Designation</label>
+                  <input type="text" class="form-control" value="{{value.designaton}}"  id="edit-designation" name="designaton" required>
+                </div>
+              </div>
+            </div>
+            <button type="submit" class="btn form-btn">Save Changes</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS Libraries -->
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const editButtons = document.querySelectorAll('.edit-icon');
+    editButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const contactId = this.getAttribute('data-id');
+        const contactName = this.getAttribute('data-name');
+        const contactNumber = this.getAttribute('data-contact');
+        const email = this.getAttribute('data-email');
+        const address = this.getAttribute('data-address');
+        const website = this.getAttribute('data-website');
+        const designation = this.getAttribute('data-designation');
+  
+        document.getElementById('editForm').action = `/edit/${contactId}/`;
+        document.getElementById('edit-contact-id').value = contactId;
+        document.getElementById('edit-contact-name').value = contactName;
+        document.getElementById('edit-contact-number').value = contactNumber;
+        document.getElementById('edit-email').value = email;
+        document.getElementById('edit-address').value = address;
+        document.getElementById('edit-website').value = website;
+        document.getElementById('edit-designation').value = designation;
+  
+        $('#editModal').modal('show');
+      });
+    });
+  
+    // Search Filter
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('keyup', function() {
+      const filter = searchInput.value.toLowerCase();
+      const todoList = document.getElementById('todoList');
+      const cards = todoList.getElementsByClassName('card');
+  
+      Array.from(cards).forEach(card => {
+        const title = card.querySelector('.card-title').textContent;
+        if (title.toLowerCase().includes(filter)) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  
+    // Handle form submission
+    const editForm = document.getElementById('editForm');
+    editForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      console.log('Form submission intercepted');
+  
+      const formData = new FormData(this);
+  
+      console.log('Form action:', this.action);
+      console.log('Form data:', Object.fromEntries(formData));
+  
+      fetch(this.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+        }
+      })
+      .then(response => {
+        console.log('Response status:', response.status);
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error('Server responded with an error');
+        }
+      })
+      .then(data => {
+        console.log('Response data:', data);
+        if (data.status === 'success') {
+          console.log('Submission successful, redirecting...');
+          window.location.href = "/create_contact/";  // Adjust this URL as needed
+        } else {
+          console.error('Form submission failed:', data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+    });
+  
+    console.log('Script loaded and DOMContentLoaded event fired');
+  });
+</script>
+
+
+</body>
+</html>

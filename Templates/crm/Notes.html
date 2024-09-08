@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EASY NOTES</title>
+  <link rel="shortcut icon" href="/static/images/Logo.png" type="image/x-icon">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <style>
+    html, body {
+      height: 100%;
+    }
+    body {
+      background-color: #f8f9fa;
+      display: flex;
+      flex-direction: column;
+    }
+    nav{
+      border-bottom: 1px solid rgba(0, 0, 0, 0.212);
+    }
+    .content-wrapper {
+      flex: 1 0 auto;
+    }
+    .notes-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      padding: 20px;
+      justify-content: flex-start;
+    }
+    .note {
+      background-color: #fef3bd;
+      border-radius: 5px;
+      padding: 15px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.16);
+      transition: all 0.5s ease;
+      cursor: move;
+      position: relative;
+      z-index: 1;
+      width: calc(25% - 15px); /* 4 cards per row, accounting for gap */
+      min-width: 250px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 1200px) {
+      .note {
+        width: calc(33.333% - 13.333px); /* 3 cards per row on smaller screens */
+      }
+    }
+    @media (max-width: 900px) {
+      .note {
+        width: calc(50% - 10px); /* 2 cards per row on even smaller screens */
+      }
+    }
+    @media (max-width: 600px) {
+      .note {
+        width: 100%; /* 1 card per row on mobile */
+      }
+    }
+    .note:hover {
+      transform: scale(1.05);
+    }
+    .note.moving {
+      transition: none;
+    }
+    .note-icons {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 10px;
+    }
+    .note-icons i {
+      margin-left: 10px;
+      cursor: pointer;
+    }
+    #searchInput{
+      border: transparent;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.144);
+      border-radius: 0px;
+    }
+    .add-note-btn {
+      position: fixed;
+      bottom: 70px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background-color: #007bff;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      z-index: 1000;
+    }
+    .footer {
+      background-color: #f8f9fa;
+      padding: 10px 20px;
+      text-align: center;
+      font-size: 12px;
+      border-top: 1px solid rgba(0, 0, 0, 0.171);
+      flex-shrink: 0;
+    }
+    #nav-logo {
+      max-width: 325px;
+      max-height: 55px;
+    }
+    .modal.fade .modal-dialog {
+      transform: scale(0.8);
+      transition: transform 0.3s ease-in-out;
+    }
+    .modal.show .modal-dialog {
+      transform: scale(1);
+    }
+    #delete{
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="content-wrapper">
+    <nav class="navbar navbar-light bg-light">
+      <a class="navbar-brand" href="/admin_dashboard">
+        <img src="/static/images/Logo.png" alt="" id="nav-logo">
+      </a>
+      <h2 class="mx-auto"><i class="ri-book-line" style="color: #007bff;" ></i> EASY LOGS NOTES</h2>
+      <form class="form-inline my-2 my-lg-0">
+        <input class="form-control mr-sm-2 shadow-none" type="search" placeholder="Search notes" aria-label="Search" id="searchInput">      
+      </form>
+    </nav>
+
+    <div class="notes-container" id="notesContainer">
+      {% for data in notes %}
+      <div class="note">
+        <h5><i class="ri-ball-pen-line" style="color: #007bff;"></i> {{data.note_title}}</h5>
+        <p>{{data.note_content}}</p>
+        <div class="note-icons">
+          <a id="delete" href="{% url "delete_note" data.id %}"><i class="ri-delete-bin-line" style="color: #dc3545;"></i></a>
+        </div>        
+      </div>
+      {% endfor %}
+    </div>
+
+    <a href="#" class="add-note-btn" id="addNoteBtn" data-toggle="modal" data-target="#addNoteModal">
+      <i class="ri-add-line"></i>
+    </a>
+
+    <!-- Add Note Modal -->
+    <div class="modal fade" id="addNoteModal" tabindex="-1" role="dialog" aria-labelledby="addNoteModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addNoteModalLabel"><i class="ri-quill-pen-fill"></i> Add New Note</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id="addNoteForm" method="POST">
+              {% csrf_token %}
+              <div class="form-group">
+                <label for="noteTitle"><i class="ri-pen-nib-fill"></i> Title</label>
+                <input type="text" class="form-control shadow-none" id="noteTitle" name="note_title" required>
+              </div>
+              <div class="form-group">
+                <label for="noteContent"><i class="ri-file-text-line"></i> Content</label>
+                <textarea class="form-control shadow-none" id="noteContent" rows="3" name="note_content" required></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary"><i class="ri-save-line"></i> Save Note</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="d-flex justify-content-between align-items-center">
+      <span> Easy Logs</span>      
+      <span id="currentTime"></span>
+      <span id="currentDay"></span>
+      <span id="currentDate"></span>
+    </div>
+  </footer>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
+
+  <script>
+    function updateDateTime() {
+      const now = new Date();
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      
+      document.getElementById('currentTime').innerHTML = `<i class="ri-time-line"></i> ${now.toLocaleTimeString()}`;
+      document.getElementById('currentDay').innerHTML = `<i class="ri-calendar-line"></i> ${days[now.getDay()]}`;
+      document.getElementById('currentDate').textContent = now.toLocaleDateString();
+    }
+
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+
+    // Real-time search functionality
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+      const searchTerm = e.target.value.toLowerCase();
+      const notes = document.querySelectorAll('.note');
+      
+      notes.forEach(note => {
+        const title = note.querySelector('h5').textContent.toLowerCase();
+        const content = note.querySelector('p').textContent.toLowerCase();
+        
+        if (title.includes(searchTerm) || content.includes(searchTerm)) {
+          note.style.display = 'block';
+        } else {
+          note.style.display = 'none';
+        }
+      });
+    });
+
+    let draggedNote = null;
+    let offsetX, offsetY;
+    let originalPosition = {};
+
+    document.querySelectorAll('.note').forEach(note => {
+      note.addEventListener('mousedown', startDragging);
+    });
+
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('mouseup', stopDragging);
+
+    function startDragging(e) {
+      draggedNote = e.target.closest('.note');
+      offsetX = e.clientX - draggedNote.getBoundingClientRect().left;
+      offsetY = e.clientY - draggedNote.getBoundingClientRect().top;
+      originalPosition = {
+        left: draggedNote.offsetLeft,
+        top: draggedNote.offsetTop
+      };
+      draggedNote.style.zIndex = 1000;
+      draggedNote.classList.add('moving');
+    }
+
+    function drag(e) {
+      if (!draggedNote) return;
+      const container = document.querySelector('.notes-container');
+      const containerRect = container.getBoundingClientRect();
+      
+      let newX = e.clientX - containerRect.left - offsetX;
+      let newY = e.clientY - containerRect.top - offsetY;
+      
+      draggedNote.style.position = 'absolute';
+      draggedNote.style.left = `${newX}px`;
+      draggedNote.style.top = `${newY}px`;
+    }
+
+    function stopDragging(e) {
+      if (!draggedNote) return;
+      
+      const container = document.querySelector('.notes-container');
+      const containerRect = container.getBoundingClientRect();
+      
+      let newX = e.clientX - containerRect.left - offsetX;
+      let newY = e.clientY - containerRect.top - offsetY;
+      
+      draggedNote.style.transition = 'all 1s ease';
+      draggedNote.style.left = `${newX}px`;
+      draggedNote.style.top = `${newY}px`;
+      
+      setTimeout(() => {
+        draggedNote.style.transition = 'all 1s ease';
+        draggedNote.style.position = 'relative';
+        draggedNote.style.left = '0';
+        draggedNote.style.top = '0';
+        
+        setTimeout(() => {
+          draggedNote.style.transition = '';
+          draggedNote.style.zIndex = 1;
+          draggedNote = null;
+          adjustNoteHeight(); // Readjust heights after animation
+        }, 1000);
+      }, 1000);
+    }
+
+    function adjustNoteHeight() {
+      const notes = document.querySelectorAll('.note');
+      let maxHeight = 0;
+
+      // First, reset heights and find the tallest note
+      notes.forEach(note => {
+        note.style.height = 'auto';
+        const height = note.offsetHeight;
+        if (height > maxHeight) {
+          maxHeight = height;
+        }
+      });
+
+      // Then, set all notes to the height of the tallest note
+      notes.forEach(note => {
+        note.style.height = `${maxHeight}px`;
+      });
+    }
+
+    // Call adjustNoteHeight on page load and window resize
+    window.addEventListener('load', adjustNoteHeight);
+    window.addEventListener('resize', adjustNoteHeight);
+  </script>
+</body>
+</html>
