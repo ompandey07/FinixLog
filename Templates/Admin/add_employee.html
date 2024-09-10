@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADD EMPLOYEE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/css/employee.css">
+    <link
+    href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css"
+    rel="stylesheet"
+/>
+
+<link rel="shortcut icon" href="/static/images/Logo.png" type="image/x-icon">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.28.0/feather.min.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="w-full max-w-3xl p-8 bg-white shadow-lg">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="flex flex-col items-center mb-8">
+                <div id="image-preview" class="w-32 h-32 overflow-hidden bg-gray-200 rounded-full mb-4 flex items-center justify-center">
+                    <img src="logo.png" alt="Fallback image" class="w-full h-full object-cover" 
+                    onerror="this.src='https://media.istockphoto.com/id/1300845620/vector/user-icon-flat-isolated-on-white-background-user-symbol-vector-illustration.jpg?s=612x612&w=0&k=20&c=yBeyba0hUkh14_jgv1OKqIH0CCSWU_4ckRkAoy2p73o='; this.onerror=null;">
+                </div>
+                <label for="image-upload" class="cursor-pointer px-4 py-2">
+                    <i class="ri-upload-cloud-line text-blue-500 text-5xl"></i>
+                </label>
+                <input id="image-upload" name="profile_image" type="file" accept="image/*" class="hidden">
+            </div>
+
+            <div class="grid grid-cols-2 gap-6">
+                <div class="flex items-center">
+                    <i data-feather="user" class="mr-2 text-gray-500"></i>
+                    <input type="text" name="first_name" placeholder="First Name" class="w-full p-2 bg-gray-100" required>
+                </div>
+                <div class="flex items-center">
+                    <i data-feather="user" class="mr-2 text-gray-500"></i>
+                    <input type="text" name="last_name" placeholder="Last Name" class="w-full p-2 bg-gray-100" required>
+                </div>
+                <div class="flex items-center">
+                    <i data-feather="mail" class="mr-2 text-gray-500"></i>
+                    <input type="email" name="email" placeholder="Email" class="w-full p-2 bg-gray-100" required>
+                </div>
+                <div class="flex items-center">
+                    <i data-feather="map-pin" class="mr-2 text-gray-500"></i>
+                    <input type="text" name="address" placeholder="Address" class="w-full p-2 bg-gray-100" required>
+                </div>
+                <div class="flex items-center">
+                    <i data-feather="phone" class="mr-2 text-gray-500"></i>
+                    <input type="tel" name="contact" placeholder="Contact" class="w-full p-2 bg-gray-100" required>
+                </div>
+                <div class="flex items-center">
+                    <i data-feather="calendar" class="mr-2 text-gray-500"></i>
+                    <input type="number" name="age" placeholder="Age" class="w-full p-2 bg-gray-100" required>
+                </div>
+                <div class="flex items-center relative">
+                    <i data-feather="user" class="mr-2 text-gray-500"></i>
+                    <input type="text" name="username" placeholder="Username" class="w-full p-2 bg-gray-100" required>
+                </div>
+                <div class="flex items-center relative">
+                    <i data-feather="lock" class="mr-2 text-gray-500"></i>
+                    <input type="password" name="password" id="password" placeholder="Password" class="w-full p-2 bg-gray-100" required>
+                    <button type="button" id="togglePassword" class="absolute right-2 top-1/2 transform -translate-y-1/2">
+                        <i data-feather="eye" class="text-gray-500"></i>
+                    </button>
+                </div>
+                <div class="flex items-center relative">
+                    <i data-feather="lock" class="mr-2 text-gray-500"></i>
+                    <input type="password" name="confirm_password" id="confirmPassword" placeholder="Confirm Password" class="w-full p-2 bg-gray-100" required>
+                    <button type="button" id="toggleConfirmPassword" class="absolute right-2 top-1/2 transform -translate-y-1/2">
+                        <i data-feather="eye" class="text-gray-500"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="mt-8 flex justify-center">
+                <button type="submit" class="bg-blue-500 text-white px-6 py-2">Save</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="/static/javascripts/employee.js"></script>
+    <script src="/static/javascripts/employee.js"></script>
+</body>
+</html>

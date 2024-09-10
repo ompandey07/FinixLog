@@ -12,7 +12,8 @@
     />
   </head>
   <body>
-    <form class="form_container">
+    <form class="form_container" method="POST">
+      {% csrf_token %}
       <div class="logo_container">
         <img src="/static/images/Logo.png" alt="" />
       </div>
@@ -47,7 +48,7 @@
         <input
           placeholder="name@mail.com"
           title="Inpit title"
-          name="input-name"
+          name="username"
           type="text"
           class="input_field"
           id="email_field"
@@ -85,7 +86,7 @@
         <input
           placeholder="Password"
           title="Inpit title"
-          name="input-name"
+          name="password"
           type="password"
           class="input_field"
           id="password_field"
