@@ -107,6 +107,8 @@ def actyvity_log(req):
     return render (req , "Admin/activity_log.html")
 
 
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
 def manage_employee(req):
     all_employees = Employee.objects.all()
     context = {
