@@ -1,8 +1,9 @@
 from django.contrib.auth import authenticate, login , logout
-from django.shortcuts import render, redirect
 from .models import Employee
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.shortcuts import render, get_object_or_404, redirect
+
 
 
 CustomUser = get_user_model()
@@ -106,9 +107,88 @@ def actyvity_log(req):
     return render (req , "Admin/activity_log.html")
 
 
+def manage_employee(req):
+    all_employees = Employee.objects.all()
+    context = {
+        'all_employees': all_employees
+    }
+    return render (req , "Admin/manage_employee.html",context)
 
 
 
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def update_employee(request, employee_id):
+    # Get the employee object based on the ID
+    employee = get_object_or_404(Employee, id=employee_id)
+    user = employee.user  # Get the related user
+
+    if request.method == 'POST':
+        # Get form data
+        employee.first_name = request.POST.get('first_name')
+        employee.last_name = request.POST.get('last_name')
+        employee.email = request.POST.get('email')
+        employee.address = request.POST.get('address')
+        employee.contact = request.POST.get('contact')
+        employee.age = request.POST.get('age')
+
+        user.username = request.POST.get('username')  # Update the associated user's username
+        user.email = request.POST.get('email')  # Update the associated user's email
+
+        # Get the passwords from the form
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
+
+        # Validate password fields
+        if password:  # Check if password field is provided
+            if password != confirm_password:
+                return render(request, 'Admin/update_employee.html', {
+                    'employee': employee,
+                    'error': 'Passwords do not match',  # Pass error message
+                    'username': user.username,
+                })
+            else:
+                # Only update the password if it is provided and valid
+                user.set_password(password)
+
+        # Handle profile image update (optional)
+        if 'profile_image' in request.FILES:
+            employee.profile_image = request.FILES['profile_image']
+
+        # Save the updated data
+        user.save()
+        employee.save()
+
+        # Redirect back to manage employee page or any other page
+        return redirect('manage_employee')
+
+    # Pass the employee object to the template for displaying current data
+    context = {
+        'employee': employee,
+        'username': user.username,  # Pass the username to the template
+        'password': user.password
+
+
+    }
+
+    return render(request, 'Admin/update_employee.html', context)
+
+
+
+
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def delete_employee(request, employee_id):
+    # Get the employee object based on the ID
+    employee = get_object_or_404(Employee, id=employee_id)
+
+    # Delete the associated user and the employee
+    user = employee.user
+    user.delete()  # This will also delete the employee due to the OneToOneField
+
+    # Redirect back to the manage employee page or any other page
+    return redirect('manage_employee')
 
 
 

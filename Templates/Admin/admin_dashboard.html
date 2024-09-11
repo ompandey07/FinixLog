@@ -1,204 +1,335 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Easy Logs</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-    <link rel="shortcut icon" href="/static/images/Logo.png" type="image/x-icon">
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="shortcut icon"
+      href="/static/images/Logo.png"
+      type="image/x-icon"
+    />
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .sidebar-submenu {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-        }
-        .sidebar-submenu.open {
-            max-height: 500px;
-            transition: max-height 0.5s ease-in;
-        }
-        .dashboard-card {
-            transition: all 0.3s ease;
-        }
-        .dashboard-card:hover {
-            transform: translateY(-5px);
-        }
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .sidebar-submenu {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out;
+      }
+      .sidebar-submenu.open {
+        max-height: 500px;
+        transition: max-height 0.5s ease-in;
+      }
+      .dashboard-card {
+        transition: all 0.3s ease;
+      }
+      .dashboard-card:hover {
+        transform: translateY(-5px);
+      }
     </style>
-</head>
-<body class="bg-gray-100 flex flex-col min-h-screen">
-    <nav class="bg-white shadow-md" style="border-bottom: 1px solid rgba(0, 0, 0, 0.212);">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex-shrink-0 flex items-center">
-                    <img class="h-8 w-auto" src="/static/images/Logo.png" alt="Easy Logs"> <b class="px-4" >Easy Logs</b>
-                </div>
-                <div class="flex items-center">
-                    <div class="ml-3 relative">
-                        <div>
-                            <button type="button" class="flex items-center max-w-xs bg-white rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 " id="user-menu-button" aria-expanded="false" aria-haspopup="true">
-                                <img class="h-8 w-8 rounded-full" src="https://cdn-icons-png.flaticon.com/512/9187/9187532.png" alt="User profile">
-                                <span class="ml-3 text-sm font-medium text-gray-700">{{ request.user.username }}</span>
-                                <svg class="ml-2 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="hidden origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1" id="user-menu">                            
-                            <a href="{% url 'logout' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" tabindex="-1" id="user-menu-item-2">Logout</a>
-                        </div>
-                    </div>
-                </div>
+  </head>
+  <body class="bg-gray-100 flex flex-col min-h-screen">
+    <nav
+      class="bg-white shadow-md"
+      style="border-bottom: 1px solid rgba(0, 0, 0, 0.212)"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+          <div class="flex-shrink-0 flex items-center">
+            <img
+              class="h-8 w-auto"
+              src="/static/images/Logo.png"
+              alt="Easy Logs"
+            />
+            <b class="px-4">Easy Logs</b>
+          </div>
+          <div class="flex items-center">
+            <div class="ml-3 relative">
+              <div>
+                <button
+                  type="button"
+                  class="flex items-center max-w-xs bg-white rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  id="user-menu-button"
+                  aria-expanded="false"
+                  aria-haspopup="true"
+                >
+                  <img
+                    class="h-8 w-8 rounded-full"
+                    src="https://cdn-icons-png.flaticon.com/512/9187/9187532.png"
+                    alt="User profile"
+                  />
+                  <span class="ml-3 text-sm font-medium text-gray-700"
+                    >{{ request.user.username }}</span
+                  >
+                  <svg
+                    class="ml-2 h-5 w-5 text-gray-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </button>
+              </div>
+              <div
+                class="hidden origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+                role="menu"
+                aria-orientation="vertical"
+                aria-labelledby="user-menu-button"
+                tabindex="-1"
+                id="user-menu"
+              >
+                <a
+                  href="{% url 'logout' %}"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  role="menuitem"
+                  tabindex="-1"
+                  id="user-menu-item-2"
+                  >Logout</a
+                >
+              </div>
             </div>
+          </div>
         </div>
+      </div>
     </nav>
 
     <div class="flex flex-1 bg-gray-100">
-        <!-- Sidebar -->
-        <div class="hidden md:flex md:flex-shrink-0"  style="border-right: 1px solid rgba(0, 0, 0, 0.212)" >
-            <div class="flex flex-col w-64">
-                <div class="flex flex-col h-0 flex-1 bg-white shadow-lg">
-                    <nav class="flex-1 px-2 py-4 space-y-1">
-                        <div x-data="{ open: false }">
-                            <button @click="open = !open" class="sidebar-button w-full flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900">
-                                <i class="ri-user-line mr-3 text-xl text-blue-500"></i>
-                                Employees
-                                <i class="ri-arrow-down-s-line ml-auto text-gray-400"></i>
-                            </button>
-                            <div class="sidebar-submenu pl-4 space-y-1">
-                                <a href="/add_employee" class="flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900">
-                                    <i class="ri-user-add-line mr-3 text-xl text-green-500"></i>
-                                    Add Employee
-                                </a>
-                                <a href="#" class="flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900">
-                                    <i class="ri-user-settings-line mr-3 text-xl text-yellow-500"></i>
-                                    Manage Employees
-                                </a>
-                            </div>
-                        </div>
-
-                        <div x-data="{ open: false }">
-                            <button @click="open = !open" class="sidebar-button w-full flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900">
-                                <i class="ri-question-line mr-3 text-xl text-purple-500"></i>
-                                Inquiries
-                                <i class="ri-arrow-down-s-line ml-auto text-gray-400"></i>
-                            </button>
-                            <div class="sidebar-submenu pl-4 space-y-1">
-                                <a href="#" class="flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900">
-                                    <i class="ri-add-circle-line mr-3 text-xl text-green-500"></i>
-                                    Add Inquiries
-                                </a>
-                                <a href="#" class="flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900">
-                                    <i class="ri-file-list-3-line mr-3 text-xl text-orange-500"></i>
-                                    Inquiries Status
-                                </a>
-                            </div>
-                        </div>
-
-                        <div x-data="{ open: false }">
-                            <button @click="open = !open" class="sidebar-button w-full flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900">
-                                <i class="ri-bank-line mr-3 text-xl text-indigo-500"></i>
-                                Banking
-                                <i class="ri-arrow-down-s-line ml-auto text-gray-400"></i>
-                            </button>
-                            <div class="sidebar-submenu pl-4 space-y-1">
-                                <a href="#" class="flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900">
-                                    <i class="ri-bank-card-line mr-3 text-xl text-green-500"></i>
-                                    Add Cheques
-                                </a>
-                                <a href="#" class="flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900">
-                                    <i class="ri-timer-line mr-3 text-xl text-yellow-500"></i>
-                                    Pending Cheques
-                                </a>
-                                <a href="#" class="flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900">
-                                    <i class="ri-file-chart-line mr-3 text-xl text-red-500"></i>
-                                    Cheques Reports
-                                </a>
-                            </div>
-                        </div>
-
-                        <a href="/calendar" class="flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900">
-                            <i class="ri-calendar-line mr-3 text-xl text-blue-500"></i>
-                            Calendar
-                        </a>
-
-                        <a href="/create_notes" class="flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900">
-                            <i class="ri-sticky-note-line mr-3 text-xl text-yellow-500"></i>
-                            Notes
-                        </a>
-
-                        <a href="/create_contact" class="flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900">
-                            <i class="ri-contacts-book-line mr-3 text-xl text-green-500"></i>
-                            Contacts
-                        </a>
-
-                        <a href="/actyvity_log" class="flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900">
-                            <i class="ri-bring-to-front mr-3 text-xl text-red-500"></i>
-                            Activity Logs
-                        </a>
-                    </nav>
+      <!-- Sidebar -->
+      <div
+        class="hidden md:flex md:flex-shrink-0"
+        style="border-right: 1px solid rgba(0, 0, 0, 0.212)"
+      >
+        <div class="flex flex-col w-64">
+          <div class="flex flex-col h-0 flex-1 bg-white shadow-lg">
+            <nav class="flex-1 px-2 py-4 space-y-1">
+              <div x-data="{ open: false }">
+                <button
+                  @click="open = !open"
+                  class="sidebar-button w-full flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900"
+                >
+                  <i class="ri-user-line mr-3 text-xl text-blue-500"></i>
+                  Employees
+                  <i class="ri-arrow-down-s-line ml-auto text-gray-400"></i>
+                </button>
+                <div class="sidebar-submenu pl-4 space-y-1">
+                  <a
+                    href="/add_employee"
+                    class="flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900"
+                  >
+                    <i class="ri-user-add-line mr-3 text-xl text-green-500"></i>
+                    Add Employee
+                  </a>
+                  <a
+                    href="/manage_employee"
+                    class="flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900"
+                  >
+                    <i
+                      class="ri-user-settings-line mr-3 text-xl text-yellow-500"
+                    ></i>
+                    Manage Employees
+                  </a>
                 </div>
+              </div>
+
+              <div x-data="{ open: false }">
+                <button
+                  @click="open = !open"
+                  class="sidebar-button w-full flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900"
+                >
+                  <i class="ri-question-line mr-3 text-xl text-purple-500"></i>
+                  Inquiries
+                  <i class="ri-arrow-down-s-line ml-auto text-gray-400"></i>
+                </button>
+                <div class="sidebar-submenu pl-4 space-y-1">
+                  <a
+                    href="#"
+                    class="flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900"
+                  >
+                    <i
+                      class="ri-add-circle-line mr-3 text-xl text-green-500"
+                    ></i>
+                    Add Inquiries
+                  </a>
+                  <a
+                    href="#"
+                    class="flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900"
+                  >
+                    <i
+                      class="ri-file-list-3-line mr-3 text-xl text-orange-500"
+                    ></i>
+                    Inquiries Status
+                  </a>
+                </div>
+              </div>
+
+              <div x-data="{ open: false }">
+                <button
+                  @click="open = !open"
+                  class="sidebar-button w-full flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900"
+                >
+                  <i class="ri-bank-line mr-3 text-xl text-indigo-500"></i>
+                  Banking
+                  <i class="ri-arrow-down-s-line ml-auto text-gray-400"></i>
+                </button>
+                <div class="sidebar-submenu pl-4 space-y-1">
+                  <a
+                    href="#"
+                    class="flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900"
+                  >
+                    <i
+                      class="ri-bank-card-line mr-3 text-xl text-green-500"
+                    ></i>
+                    Add Cheques
+                  </a>
+                  <a
+                    href="#"
+                    class="flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900"
+                  >
+                    <i class="ri-timer-line mr-3 text-xl text-yellow-500"></i>
+                    Pending Cheques
+                  </a>
+                  <a
+                    href="#"
+                    class="flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900"
+                  >
+                    <i class="ri-file-chart-line mr-3 text-xl text-red-500"></i>
+                    Cheques Reports
+                  </a>
+                </div>
+              </div>
+
+              <a
+                href="/calendar"
+                class="flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900"
+              >
+                <i class="ri-calendar-line mr-3 text-xl text-blue-500"></i>
+                Calendar
+              </a>
+
+              <a
+                href="/create_notes"
+                class="flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900"
+              >
+                <i class="ri-sticky-note-line mr-3 text-xl text-yellow-500"></i>
+                Notes
+              </a>
+
+              <a
+                href="/create_contact"
+                class="flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900"
+              >
+                <i
+                  class="ri-contacts-book-line mr-3 text-xl text-green-500"
+                ></i>
+                Contacts
+              </a>
+
+              <a
+                href="/actyvity_log"
+                class="flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900"
+              >
+                <i class="ri-bring-to-front mr-3 text-xl text-red-500"></i>
+                Activity Logs
+              </a>
+            </nav>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main content -->
+      <div class="flex-1 overflow-auto focus:outline-none">
+        <main
+          class="flex-1 relative z-0 overflow-y-auto py-6 focus:outline-none"
+        >
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+            <h1 class="text-2xl font-semibold text-gray-900 mb-6">
+              <i class="ri-dashboard-line"></i> Dashboard
+            </h1>
+          </div>
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+            <!-- Dashboard content -->
+            <div class="grid grid-cols-2 gap-6">
+              <!-- Inquiries -->
+              <div
+                class="dashboard-card bg-white rounded-lg shadow-lg p-6 flex flex-col items-center justify-center transform transition-all duration-300 hover:shadow-xl"
+              >
+                <i
+                  class="ri-question-answer-line text-5xl text-blue-500 mb-4"
+                ></i>
+                <h2 class="text-2xl font-semibold text-gray-800">Inquiries</h2>
+                <p class="text-gray-600 mt-2">13</p>
+              </div>
+
+              <!-- Cheques -->
+              <div
+                class="dashboard-card bg-white rounded-lg shadow-lg p-6 flex flex-col items-center justify-center transform transition-all duration-300 hover:shadow-xl"
+              >
+                <i class="ri-bank-card-line text-5xl text-green-500 mb-4"></i>
+                <h2 class="text-2xl font-semibold text-gray-800">
+                  Pending Cheques
+                </h2>
+                <p class="text-gray-600 mt-2">50</p>
+              </div>
+
+              <!-- Contacts -->
+              <div
+                class="dashboard-card bg-white rounded-lg shadow-lg p-6 flex flex-col items-center justify-center transform transition-all duration-300 hover:shadow-xl"
+              >
+                <i
+                  class="ri-contacts-book-2-line text-5xl text-purple-500 mb-4"
+                ></i>
+                <h2 class="text-2xl font-semibold text-gray-800">Contacts</h2>
+                <p class="text-gray-600 mt-2">50</p>
+              </div>
+
+              <!-- Employees -->
+              <div
+                class="dashboard-card bg-white rounded-lg shadow-lg p-6 flex flex-col items-center justify-center transform transition-all duration-300 hover:shadow-xl"
+              >
+                <i class="ri-team-line text-5xl text-orange-500 mb-4"></i>
+                <h2 class="text-2xl font-semibold text-gray-800">Employees</h2>
+                <p class="text-gray-600 mt-2">8</p>
+              </div>
             </div>
-        </div>
-
-        <!-- Main content -->
-        <div class="flex-1 overflow-auto focus:outline-none">
-            <main class="flex-1 relative z-0 overflow-y-auto py-6 focus:outline-none">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-                    <h1 class="text-2xl font-semibold text-gray-900 mb-6"><i class="ri-dashboard-line"></i> Dashboard</h1>
-                </div>
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-                    <!-- Dashboard content -->
-                    <div class="grid grid-cols-2 gap-6">
-                        <!-- Inquiries -->
-                        <div class="dashboard-card bg-white rounded-lg shadow-lg p-6 flex flex-col items-center justify-center transform transition-all duration-300 hover:shadow-xl">
-                            <i class="ri-question-answer-line text-5xl text-blue-500 mb-4"></i>
-                            <h2 class="text-2xl font-semibold text-gray-800">Inquiries</h2>
-                            <p class="text-gray-600 mt-2">13</p>
-                        </div>
-                        
-                        <!-- Cheques -->
-                        <div class="dashboard-card bg-white rounded-lg shadow-lg p-6 flex flex-col items-center justify-center transform transition-all duration-300 hover:shadow-xl">
-                            <i class="ri-bank-card-line text-5xl text-green-500 mb-4"></i>
-                            <h2 class="text-2xl font-semibold text-gray-800">Pending Cheques</h2>
-                            <p class="text-gray-600 mt-2">50</p>
-                        </div>
-                        
-                        <!-- Contacts -->
-                        <div class="dashboard-card bg-white rounded-lg shadow-lg p-6 flex flex-col items-center justify-center transform transition-all duration-300 hover:shadow-xl">
-                            <i class="ri-contacts-book-2-line text-5xl text-purple-500 mb-4"></i>
-                            <h2 class="text-2xl font-semibold text-gray-800">Contacts</h2>
-                            <p class="text-gray-600 mt-2">50</p>
-                        </div>
-                        
-                        <!-- Employees -->
-                        <div class="dashboard-card bg-white rounded-lg shadow-lg p-6 flex flex-col items-center justify-center transform transition-all duration-300 hover:shadow-xl">
-                            <i class="ri-team-line text-5xl text-orange-500 mb-4"></i>
-                            <h2 class="text-2xl font-semibold text-gray-800">Employees</h2>
-                            <p class="text-gray-600 mt-2">8</p>
-                        </div>
-                    </div>
-                </div>
-            </main>
-        </div>
+          </div>
+        </main>
+      </div>
     </div>
 
     <!-- Sticky Footer -->
-    <footer class="bg-white shadow-md h-10 w-full flex items-center justify-between px-4 text-xs" style="border-top: 1px solid rgba(0, 0, 0, 0.212);">
-        <div class="flex-shrink-0 flex items-center">
-            <img class="h-6 w-auto" src="/static/images/Logo.png" alt="Easy Logs"> <b class="px-2" >Easy Logs</b>
-        </div>
-        <div class="flex items-center space-x-4 text-center">
-            <div id="current-time" class="text-gray-600"></div>
-            <div id="current-day" class="text-gray-600"></div>
-            <div id="current-date" class="text-gray-600"></div>
-        </div>
+    <footer
+      class="bg-white shadow-md h-10 w-full flex items-center justify-between px-4 text-xs"
+      style="border-top: 1px solid rgba(0, 0, 0, 0.212)"
+    >
+      <div class="flex-shrink-0 flex items-center">
+        <img class="h-6 w-auto" src="/static/images/Logo.png" alt="Easy Logs" />
+        <b class="px-2">Easy Logs</b>
+      </div>
+      <div class="flex items-center space-x-4 text-center">
+        <div id="current-time" class="text-gray-600"></div>
+        <div id="current-day" class="text-gray-600"></div>
+        <div id="current-date" class="text-gray-600"></div>
+      </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>    
+    <script
+      src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js"
+      defer
+    ></script>
     <script src="/static/javascripts/admin.js"></script>
-</body>
+  </body>
 </html>
