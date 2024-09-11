@@ -16,9 +16,16 @@ def login_page(request):
             login(request, user)
             if user.is_superuser:
                 return redirect('admin_dashboard')
-            elif user.is_employee:
+            elif hasattr(user, 'employee'):  # Check if user is an employee
                 return redirect('users_dashboard')
+            else:
+                return redirect('default_dashboard')  # Redirect to some default page if neither admin nor employee
+        else:
+            return render(request, "index.html", {'error': 'Invalid credentials'})
     return render(request, "index.html")
+
+
+
 
 
 def logout_view(request):
@@ -36,8 +43,14 @@ def admin_dashboard(request):
 
 
 
-def users_dashboard(req):
-    return render (req , "Users/users_dashboard.html")
+@login_required
+def users_dashboard(request):
+    user = request.user
+    employee = Employee.objects.filter(user=user).first() 
+    context = {
+        'employee': employee,
+    }
+    return render(request, "Users/users_dashboard.html", context)
 
 
 CustomUser = get_user_model()
@@ -46,10 +59,9 @@ def is_admin(user):
     return user.is_superuser
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(lambda u: u.is_superuser)
 def add_employee(request):
     if request.method == 'POST':
-        # Extract data from POST request
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         email = request.POST.get('email')
@@ -87,5 +99,17 @@ def add_employee(request):
     return render(request, 'Admin/add_employee.html')
 
 
+
+
+
 def actyvity_log(req):
     return render (req , "Admin/activity_log.html")
+
+
+
+
+
+
+
+
+

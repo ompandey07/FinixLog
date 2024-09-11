@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import path
+
 from database import views
 urlpatterns = [
 
@@ -23,3 +24,4 @@ urlpatterns = [
     path('update-event/<int:event_id>/', views.update_event, name='update_event'),
     path('delete-event/<int:event_id>/', views.delete_event, name='delete_event'),
 ]
+

@@ -22,3 +22,4 @@ urlpatterns = [
     path('', include('database.urls')),
     path('', include('userauths.urls')),
 ]
+
