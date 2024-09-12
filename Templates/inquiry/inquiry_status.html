@@ -1,11 +1,197 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EASY LOGS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="shortcut icon"
+      href="/static/images/Logo.png"
+      type="image/x-icon"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+  </head>
+
+  <body class="flex flex-col min-h-screen">
+    <nav class="p-4 border-b">
+      <div class="container mx-auto flex items-center justify-between">
+        <div class="flex items-center">
+          <a href= {% if is_superuser %} '/admin_dashboard' {% else %} '/users_dashboard' {% endif %}>
+            <img
+              src="/static/images/Logo.png"
+              alt="Logo"
+              class="h-8 w-8 mr-2"
+            />
+          </a>
+          <span class="text-xl font-bold">Inquiry Status</span>
+        </div>
+      </div>
+    </nav>
+
+    <main class="flex-grow w-full overflow-x-auto">
+      <table class="w-full border-collapse text-sm border border-gray-300">
+        <thead>
+          <tr class="bg-gray-100">
+            <th class="border border-gray-300 w-15">
+              <i class="ri-hashtag ri-glow text-blue-500"></i> SN
+            </th>
+
+            <th class="border border-gray-300">
+              <i class="ri-task-line ri-glow text-green-500"></i> Customer Name
+            </th>
+            <th class="border border-gray-300">
+              <i class="ri-task-line ri-glow text-green-500"></i> Company Name
+            </th>
+            <th class="border border-gray-300">
+              <i class="ri-task-line ri-glow text-green-500"></i> Date
+            </th>
+            <th class="border border-gray-300">
+              <i class="ri-user-3-line ri-glow text-purple-500"></i> Contact
+              Number
+            </th>
+            <th class="border border-gray-300">
+              <i class="ri-calendar-line ri-glow text-red-500"></i> Address
+            </th>
+            <th class="border border-gray-300">
+              <i class="ri-time-line ri-glow text-yellow-500"></i> Call Received
+              By
+            </th>
+            <th class="border border-gray-300">
+              <i class="ri-time-line ri-glow text-yellow-500"></i> Remarks
+            </th>
+            <th class="border border-gray-300">
+              <i class="ri-time-line ri-glow text-yellow-500"></i> Inquiry
+              Status
+            </th>
+            <th class="border border-gray-300">
+              <i class="ri-time-line ri-glow text-yellow-500"></i> Activity
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for inquiry in all_inquiry %}
+          <tr>
+            <td class="border border-gray-300 px-2 text-center">
+              {{ forloop.counter }}
+            </td>
+
+            <td class="border border-gray-300 px-2">
+              {{inquiry.customer_name}}
+            </td>
+            <td class="border border-gray-300 px-2">
+              {{inquiry.company_name}}
+            </td>
+            <td class="border border-gray-300 px-2">{{inquiry.date }}</td>
+            <td class="border border-gray-300 px-2">
+              {{inquiry.contact_number}}
+            </td>
+            <td class="border border-gray-300 px-2">{{inquiry.address}}</td>
+            <td class="border border-gray-300 px-2">
+              {{inquiry.called_received_by}}
+            </td>
+            <td class="border border-gray-300 max-w-[300px] py-0 px-2">
+              <div class="max-h-[30px] h-full overflow-y-scroll">
+                {{inquiry.remarks}}
+              </div>
+            </td>
+
+            <td class="border border-gray-300 px-2">
+              <form
+                method="post"
+                action="{% url 'update_inquiry_status' inquiry.id %}"
+              >
+                {% csrf_token %}
+                <select
+                  name="status_of_inquiry"
+                  class="mt-1 block w-full border-gray-300 shadow-sm focus:border-indigo-500 sm:text-sm py-3 px-4"
+                  onchange="this.form.submit()"
+                >
+                  <option
+                    value="pending"
+                    {% if not inquiry.is_completed %}selected{% endif %}
+                  >
+                    pending
+                  </option>
+                  <option
+                    value="completed"
+                    {%if inquiry.is_completed %}selected{% endif %}
+                  >
+                    completed
+                  </option>
+                </select>
+              </form>
+            </td>
+
+            <td class="border border-gray-300 px-2">
+              <div class="flex gap-4 justify-center">
+                <a href="{% url 'update_inquiry' inquiry.id %}">
+                  <i class="fas fa-edit text-blue-500 cursor-pointer"></i>
+                  <!-- Update icon in blue -->
+                </a>
+                {% if is_superuser %}
+                <a
+                  href="{% url 'delete_inquiry' inquiry.id %}"
+                  onclick="return confirm('Are you sure you want to delete this inquiry?');"
+                >
+                  <i class="fas fa-trash-alt text-red-500 cursor-pointer"></i>
+                  <!-- Delete icon in red -->
+                </a>
+
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </main>
+
+    <footer class="text-gray-800 p-4 h-15 fixed bottom-0 w-full border-t">
+      <div class="container mx-auto flex justify-between items-center text-sm">
+        <div class="flex-shrink-0 flex items-center">
+          <img
+            class="h-6 w-auto"
+            src="/static/images/Logo.png"
+            alt="Easy Logs"
+          />
+          <b class="px-4">Easy Logs</b>
+        </div>
+        <span id="current-time"></span>
+        <span id="current-date"></span>
+      </div>
+    </footer>
+
+    <script>
+      function updateDateTime() {
+        const now = new Date();
+        const days = [
+          "Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+        ];
+        const timeElement = document.getElementById("current-time");
+        const dateElement = document.getElementById("current-date");
+
+        timeElement.textContent = now.toLocaleTimeString();
+        dateElement.textContent = `${
+          days[now.getDay()]
+        }, ${now.toLocaleDateString()}`;
+      }
+
+      updateDateTime();
+      setInterval(updateDateTime, 1000);
+    </script>
+  </body>
 </html>
