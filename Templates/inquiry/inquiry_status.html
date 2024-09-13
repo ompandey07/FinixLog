@@ -54,6 +54,9 @@
               <i class="ri-task-line ri-glow text-green-500"></i> Date
             </th>
             <th class="border border-gray-300">
+              <i class="ri-task-line ri-glow text-green-500"></i> Miti
+            </th>
+            <th class="border border-gray-300">
               <i class="ri-user-3-line ri-glow text-purple-500"></i> Contact
               Number
             </th>
@@ -90,6 +93,7 @@
               {{inquiry.company_name}}
             </td>
             <td class="border border-gray-300 px-2">{{inquiry.date }}</td>
+            <td class="border border-gray-300 px-2">{{inquiry.miti }}</td>
             <td class="border border-gray-300 px-2">
               {{inquiry.contact_number}}
             </td>
@@ -103,7 +107,7 @@
               </div>
             </td>
 
-            <td class="border border-gray-300 px-2">
+            {% comment %} <td class="border border-gray-300 px-2">
               <form
                 method="post"
                 action="{% url 'update_inquiry_status' inquiry.id %}"
@@ -128,7 +132,23 @@
                   </option>
                 </select>
               </form>
-            </td>
+            </td> {% endcomment %}
+            <td class="border border-gray-300 px-2">
+              <form method="post" action="{% url 'update_inquiry_status' inquiry.id %}">
+                {% csrf_token %}
+                <select name="status_of_inquiry" class="mt-1 block w-full border-gray-300 shadow-sm focus:border-indigo-500 sm:text-sm py-3 px-4" onchange="this.form.submit()">
+                    <option value="new" {% if inquiry.status == 'new' %}selected{% endif %}>New</option>
+                    <option value="on_progress" {% if inquiry.status == 'on_progress' %}selected{% endif %}>On Progress</option>
+                    <option value="reverted" {% if inquiry.status == 'reverted' %}selected{% endif %}>Reverted</option>
+                    <option value="confirmed" {% if inquiry.status == 'confirmed' %}selected{% endif %}>Confirmed</option>
+                    <option value="sold" {% if inquiry.status == 'sold' %}selected{% endif %}>Sold</option>
+                    <option value="not_fixed" {% if inquiry.status == 'not_fixed' %}selected{% endif %}>Not Fixed</option>
+                    <option value="declined" {% if inquiry.status == 'declined' %}selected{% endif %}>Declined</option>
+                    <option value="mood_changed" {% if inquiry.status == 'mood_changed' %}selected{% endif %}>Mood Changed</option>
+                    <option value="others" {% if inquiry.status == 'others' %}selected{% endif %}>Others</option>
+                </select>
+            </form>
+          </td>
 
             <td class="border border-gray-300 px-2">
               <div class="flex gap-4 justify-center">

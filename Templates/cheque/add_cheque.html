@@ -7,6 +7,20 @@
     <title>EASY LOGS CHEQUES</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link
+      href="https://nepalidatepicker.sajanmaharjan.com.np/nepali.datepicker/css/nepali.datepicker.v4.0.4.min.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+    />
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://nepalidatepicker.sajanmaharjan.com.np/nepali.datepicker/js/nepali.datepicker.v4.0.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@sbmdkl/nepali-date-converter@2.0.3/dist/@sbmdkl/nepali-date-converter.umd.min.js"></script>
+
 </head>
 
 <body class="bg-gray-100 min-h-screen flex items-center justify-center">
@@ -16,18 +30,18 @@
             <div class="col-span-1 relative">
                 <label for="handledBy" class="block text-sm font-medium  text-gray-700 mb-1">Handled By</label>
                 <i class="ri-user-line absolute left-3 top-9 text-indigo-500"></i>
-                <!-- <input type="text" id="handledBy" name="handledBy"
-                    class="pl-10 pr-3 py-3 w-full border border-gray-200 focus:outline-none focus:border-gray-200"
-                    value="{{ request.user.name }}" readonly /> -->
-                <select
-                    name="called_received_by"
-                    id="employee"
+                {% comment %} <input type="text" id="handledBy" name="handledBy"
+                    class="pl-10 pr-3 hidden py-3 w-full border border-gray-200 focus:outline-none focus:border-gray-200"
+                    value="{{ request.user.name }}" readonly />  {% endcomment %}
+                    <select
+                    name="handled_by"
+                    id="cheque_handled_by"
                     class="mt-1 px-8 block w-full border-gray-300 shadow-sm focus:border-indigo-500 sm:text-sm py-3 "
-                    {% if all_employees|length <= 1 %} disabled {% endif %}
+                    {% if all_employees|length <= 1 %} readonly {% endif %}
                 >
                     {% for employee in all_employees %}
                     <option value="{{ employee.first_name }} {{ employee.last_name }}"
-                        {% if employee.first_name|add:' '|add:employee.last_name == called_received_by %} selected {% endif %}>
+                        {% if employee.first_name|add:' '|add:employee.last_name == handled_by %} selected {% endif %}>
                         {{ employee.first_name }} {{ employee.last_name }}
                     </option>
                     {% endfor %}
@@ -68,25 +82,26 @@
                     class="pl-10 pr-3 py-3 w-full border border-gray-200 focus:outline-none focus:border-gray-200" />
             </div>
             <div class="col-span-1 relative">
-                <label for="chequeDate" class="block text-sm font-medium text-gray-700 mb-1">Cheque Date</label>
+                <label for="cheque_date" class="block text-sm font-medium text-gray-700 mb-1">Cheque Date</label>
                 <i class="ri-calendar-line absolute left-3 top-9 text-yellow-500"></i>
-                <input type="date" id="chequeDate" name="chequeDate"
+                <input type="date" id="in_date_eng" name="cheque_date"
                     class="pl-10 pr-3 py-3 w-full border border-gray-200 focus:outline-none focus:border-gray-200"
                     required />
             </div>
             <div class="col-span-1 relative">
-                <label for="mit" class="block text-sm font-medium text-gray-700 mb-1">Miti</label>
-                <i class="ri-calendar-line absolute left-3 top-9 text-indigo-500"></i>
-                <input type="text" id="mit" name="mit"
+                <label for="cheque_miti" class="block text-sm font-medium text-gray-700 mb-1">Cheque Miti</label>
+                <i class="ri-calendar-line absolute left-3 top-9 text-green-500"></i>
+                <input type="text" name="cheque_miti" id="in_date_nep" 
                     class="pl-10 pr-3 py-3 w-full border border-gray-200 focus:outline-none focus:border-gray-200"
-                     />
+                    required />
             </div>
+           
             <div class="col-span-1 relative">
                 <label for="reminderEmail" class="block text-sm font-medium text-gray-700 mb-1">Reminder Email</label>
                 <i class="ri-mail-send-line absolute left-3 top-9 "></i>
                 <input type="text" id="reminderEmail" name="reminderEmail"
                     class="pl-10 pr-3 py-3 w-full border border-gray-200 focus:outline-none focus:border-gray-200"
-                    value="{{ request.user.email }}" readonly />
+                     />
             </div>
             <div class="col-span-1 relative">
                 <label for="extraReminderEmail" class="block text-sm font-medium text-gray-700 mb-1">Extra Reminder
@@ -113,6 +128,72 @@
             document.getElementById('chequeDate').value = formattedDate;
         });
     </script>
+    <script>
+        function openCustomDatePicker(inputId) {
+          // Implement date picker opening logic here
+          console.log("Opening date picker for", inputId);
+        }
+  
+        // date-conversion.js
+  
+        document.addEventListener("DOMContentLoaded", function () {
+          let isSyncing = false;
+  
+          // Initialize date synchronization for multiple pairs of dates
+          initializeDateSync("in_date_eng", "in_date_nep");
+          initializeDateSync("date_of_sale_eng", "date_of_sale_nep");
+          initializeDateSync("delivery_date_eng", "delivery_date_nep");
+  
+          function initializeDateSync(engDateId, nepDateId) {
+            const englishDatePicker = flatpickr(`#${engDateId}`, {
+              dateFormat: "Y-m-d",
+              onChange: function (selectedDates, dateStr) {
+                if (!isSyncing) {
+                  isSyncing = true;
+                  loadNepaliDate(dateStr, nepDateId);
+                  isSyncing = false;
+                }
+              },
+            });
+  
+            const nepaliDatePicker = document.getElementById(nepDateId);
+            nepaliDatePicker.nepaliDatePicker({
+              dateFormat: "YYYY-MM-DD",
+              closeOnDateSelect: true,
+              onChange: function () {
+                if (!isSyncing) {
+                  isSyncing = true;
+                  const nepaliDate = nepaliDatePicker.value;
+                  loadEnglishDate(nepaliDate, engDateId);
+                  isSyncing = false;
+                }
+              },
+            });
+  
+            // Load the current system date on page load
+            loadCurrentSystemDate(engDateId, nepDateId);
+          }
+  
+          function loadCurrentSystemDate(engDateId, nepDateId) {
+            const currentDate = new Date();
+            const formattedDate = currentDate.toISOString().split("T")[0];
+            document.getElementById(engDateId).value = formattedDate;
+            loadNepaliDate(formattedDate, nepDateId);
+          }
+  
+          function loadNepaliDate(englishDate, nepDateId) {
+            const { adToBs } = window["@sbmdkl/nepali-date-converter"];
+            const bsDate = adToBs(englishDate);
+            document.getElementById(nepDateId).value = bsDate;
+          }
+  
+          function loadEnglishDate(nepaliDate, engDateId) {
+            const { bsToAd } = window["@sbmdkl/nepali-date-converter"];
+            const adDate = bsToAd(nepaliDate);
+            document.getElementById(engDateId).value = adDate;
+          }
+        });
+      </script>
 </body>
 
 </html>

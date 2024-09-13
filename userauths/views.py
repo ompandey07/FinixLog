@@ -1,12 +1,30 @@
 from django.contrib.auth import authenticate, login , logout
 from .models import Employee,Inquiry,Cheque
+from database.models import Crm_Contacts
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render, get_object_or_404, redirect
+from django.http import JsonResponse
+from django.http import HttpResponseRedirect
+
+
 
 
 
 CustomUser = get_user_model()
+
+def prevent_admin_access(view_func):
+    def _wrapped_view(request, *args, **kwargs):
+        if request.user.is_superuser:
+            # Option 1: Redirect to another page
+            return redirect('admin_dashboard')  # Replace with the desired route
+
+            # Option 2: Return a forbidden response
+            # return HttpResponseForbidden("You are not allowed to access this page.")
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view
+
+
 
 def login_page(request):
     if request.method == 'POST':
@@ -37,17 +55,51 @@ def is_superuser(user):
 @login_required
 @user_passes_test(is_superuser)
 def admin_dashboard(request):
-    return render(request, 'Admin/admin_dashboard.html')
+    inquiries_count = Inquiry.objects.count()
+    pending_cheques_count = Cheque.objects.filter(pending_status=True).count()  # Adjust the filter as necessary
+    employees_count = Employee.objects.count()
+    contacts_count = Crm_Contacts.objects.count()
+    
+
+    # Prepare the context
+    context = {
+        'inquiries_count': inquiries_count,
+        'pending_cheques_count': pending_cheques_count,
+        'employees_count': employees_count,
+        'contacts_count': contacts_count,
+    }
+    
+    
+    return render(request, 'Admin/admin_dashboard.html',context)
+
+
 
 
 
 @login_required
+@prevent_admin_access
 def users_dashboard(request):
     user = request.user
     employee = Employee.objects.filter(user=user).first() 
+  
+    inquiries_count = Inquiry.objects.count()
+    pending_cheques_count = Cheque.objects.filter(pending_status=True).count()  # Adjust the filter as necessary
+    employees_count = Employee.objects.count()
+    contacts_count = Crm_Contacts.objects.count()
+
+    
+
+    # Prepare the context
     context = {
+        'inquiries_count': inquiries_count,
+        'pending_cheques_count': pending_cheques_count,
+        'employees_count': employees_count,
         'employee': employee,
+        'contacts_count': contacts_count,
+
+
     }
+    
     return render(request, "Users/users_dashboard.html", context)
 
 
@@ -102,22 +154,25 @@ def add_employee(request):
 
 
 @login_required
-@user_passes_test(lambda u: u.is_superuser)
+# @user_passes_test(lambda u: u.is_superuser)
 def add_cheque(request):
     all_employees = Employee.objects.all()
 
     if request.method == 'POST':
         # Get data from the form submission
-        handled_by = request.user
+        handled_by = request.POST.get('handled_by')
+
+
         company_name = request.POST.get('companyName')
         bank_name = request.POST.get('bankName')
         cheque_number = request.POST.get('chequeNumber')
         cheque_amount = request.POST.get('chequeAmount')
         remarks = request.POST.get('remarks')
-        cheque_date = request.POST.get('chequeDate')
-        mit = request.POST.get('mit')
+        cheque_date = request.POST.get('cheque_date')
+        cheque_miti = request.POST.get('cheque_miti')
         reminder_email = request.POST.get('reminderEmail')
         extra_reminder_email = request.POST.get('extraReminderEmail')
+        
 
         # Create a new Cheque instance
         cheque = Cheque(
@@ -128,7 +183,7 @@ def add_cheque(request):
             cheque_amount=cheque_amount,
             remarks=remarks,
             cheque_date=cheque_date,
-            mit=mit,
+            cheque_miti=cheque_miti,
             reminder_email=reminder_email,
             extra_reminder_email=extra_reminder_email
         )
@@ -137,7 +192,7 @@ def add_cheque(request):
         cheque.save()
 
         # Redirect to a success page or return to form with a success message
-        return redirect('add_cheque')  # Replace with your actual success URL
+        return redirect('due_cheque_reports')  # Replace with your actual success URL
     context = {
         
     }
@@ -164,6 +219,7 @@ def add_inquiry(request):
     if request.method == 'POST':
         # Get data from the form submission
         date = request.POST.get('date')
+        miti = request.POST.get('miti')
         customer_name = request.POST.get('customer_name')
         company_name = request.POST.get('company_name')
         contact_number = request.POST.get('contact_number')
@@ -194,6 +250,7 @@ def add_inquiry(request):
         inquiry = Inquiry(
             # form_no=form_no,
             date=date,
+            miti=miti,
             customer_name=customer_name,
             company_name=company_name,
             contact_number=contact_number,
@@ -264,19 +321,80 @@ def update_inquiry(request,inquiry_id):
 
 
 
+# @login_required
+# # @user_passes_test(lambda u: u.is_superuser)
+# def inquiry_status(req):
+#     all_inquiry = Inquiry.objects.all()
+#     all_employees = Employee.objects.all()
+
+#     context = {
+#         'all_inquiry': all_inquiry,
+#         'is_superuser': req.user.is_superuser,  # Add this line
+
+#     }
+
+    
+
+#     # Check if the user is a superuser or an employee
+#     if req.user.is_superuser:
+#         context['all_employees'] = all_employees
+#     else:
+#         # If the user is not an admin, filter to only their employee
+#         employee = Employee.objects.filter(user=req.user).first()
+#         context['all_employees'] = [employee] if employee else []  # Ensure there's a list
+#     return render (req , "inquiry/inquiry_status.html",context)
+
+
 @login_required
-# @user_passes_test(lambda u: u.is_superuser)
 def inquiry_status(req):
-    all_inquiry = Inquiry.objects.all()
-    context = {
-        'all_inquiry': all_inquiry,
-        'is_superuser': req.user.is_superuser,  # Add this line
+    # Get all employees
+    all_employees = Employee.objects.all()
 
-    }
-    return render (req , "inquiry/inquiry_status.html",context)
+    # Check if the user is a superuser
+    if req.user.is_superuser:
+        all_inquiry = Inquiry.objects.all()  # All inquiries for superusers
+        context = {
+            'all_inquiry': all_inquiry,
+            'is_superuser': True,
+            'all_employees': all_employees,
+        }
+    else:
+        # If the user is not a superuser, filter inquiries by the employee they are associated with
+        employee = Employee.objects.filter(user=req.user).first()
+        context = {
+            'is_superuser': False,
+            'all_employees': [employee] if employee else [],
+        }
+
+        # Filter inquiries based on called_received_by matching the employee's first and last name
+        if employee:
+            # Split the employee's full name into first and last name
+            employee_full_name = f"{employee.first_name} {employee.last_name}"
+            
+            # Filter inquiries where called_received_by matches the employee's full name
+            all_inquiry = Inquiry.objects.filter(called_received_by__icontains=employee_full_name)
+        else:
+            all_inquiry = Inquiry.objects.none()  # No inquiries if there's no associated employee
+
+        context['all_inquiry'] = all_inquiry
+
+    return render(req, "inquiry/inquiry_status.html", context)
 
 
 
+
+
+# @login_required
+# def update_inquiry_status(req, inquiry_id):
+#     inquiry = Inquiry.objects.get(id=inquiry_id)
+    
+#     if req.method == "POST":
+#         status = req.POST.get("status_of_inquiry")
+#         inquiry.is_completed = (status == "completed")  # Set is_completed based on selected status
+#         inquiry.save()
+#         return redirect('inquiry_status')  # Redirect back to the inquiry status page
+
+#     return redirect('inquiry_status')  # Handle GET requests
 
 @login_required
 def update_inquiry_status(req, inquiry_id):
@@ -284,13 +402,11 @@ def update_inquiry_status(req, inquiry_id):
     
     if req.method == "POST":
         status = req.POST.get("status_of_inquiry")
-        inquiry.is_completed = (status == "completed")  # Set is_completed based on selected status
+        inquiry.status = status  # Set status based on selected value
         inquiry.save()
         return redirect('inquiry_status')  # Redirect back to the inquiry status page
 
     return redirect('inquiry_status')  # Handle GET requests
-
-
 
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
@@ -398,4 +514,98 @@ def delete_employee(request, employee_id):
 
 
 
+
+@login_required
+# @user_passes_test(lambda u: u.is_superuser)
+def cheque_reports(request):
+    all_cheques = Cheque.objects.filter(diposited=False)
+    all_employees = Employee.objects.all()
+    context = {
+        'all_cheques': all_cheques,
+        'is_superuser': request.user.is_superuser,  
+
+
+    }
+
+    # Check if the user is a superuser or an employee
+    if request.user.is_superuser:
+        context['all_employees'] = all_employees
+    else:
+        # If the user is not an admin, filter to only their employee
+        employee = Employee.objects.filter(user=request.user).first()
+        context['all_employees'] = [employee] if employee else []  # Ensure there's a list
+
+
+    
+    return render (request , "cheque/cheque_reports.html",context)
+
+@login_required
+# @user_passes_test(lambda u: u.is_superuser)
+def pending_cheque_reports(request):
+    all_cheques = Cheque.objects.filter(diposited=True,pending_status=True)
+    all_employees = Employee.objects.all()
+
+    context = {
+        'all_cheques': all_cheques,
+        'is_superuser': request.user.is_superuser,  
+
+
+    }
+
+    # Check if the user is a superuser or an employee
+    if request.user.is_superuser:
+        context['all_employees'] = all_employees
+    else:
+        # If the user is not an admin, filter to only their employee
+        employee = Employee.objects.filter(user=request.user).first()
+        context['all_employees'] = [employee] if employee else []  # Ensure there's a list
+    return render (request , "cheque/pending_cheque_reports.html",context)
+
+
+@login_required
+# @user_passes_test(lambda u: u.is_superuser)
+def completed_cheque_reports(request):
+    all_cheques = Cheque.objects.filter(diposited=True,pending_status=False)
+    all_employees = Employee.objects.all()
+
+    context = {
+        'all_cheques': all_cheques,
+
+    }
+
+    # Check if the user is a superuser or an employee
+    if request.user.is_superuser:
+        context['all_employees'] = all_employees
+    else:
+        # If the user is not an admin, filter to only their employee
+        employee = Employee.objects.filter(user=request.user).first()
+        context['all_employees'] = [employee] if employee else []  # Ensure there's a list
+    return render (request , "cheque/completed_cheque_reports.html",context)
+
+
+
+@login_required
+# @user_passes_test(lambda u: u.is_superuser)
+def deposit_cheque(request, cheque_id):
+    cheque = get_object_or_404(Cheque, id=cheque_id)
+    cheque.diposited = True
+    cheque.save()
+    return JsonResponse({'status': 'success'}) 
+
+
+
+@login_required
+# @user_passes_test(lambda u: u.is_superuser)
+def cheque_update_status(request, cheque_id):
+    cheque = get_object_or_404(Cheque, id=cheque_id)
+    
+    if request.method == "POST":
+        cheque_pending_status = request.POST.get("cheque_pending_status")
+        if cheque_pending_status == "completed":
+            cheque.pending_status = False
+        else:
+            cheque.pending_status = True
+        
+        cheque.save()
+        return redirect('pending_cheque_reports')  
 

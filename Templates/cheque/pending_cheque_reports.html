@@ -32,8 +32,8 @@
     <nav class="sticky top-0 bg-white shadow-md z-10">
       <div class="w-full px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
-          <a href= {% if is_superuser %} '/admin_dashboard' {% else %} '/users_dashboard' {% endif %}>
-            <img
+            <a href= {% if is_superuser %} '/admin_dashboard' {% else %} '/users_dashboard' {% endif %}>
+              <img
               class="h-8 w-auto"
               src="/static/images/Logo.png"
               alt="Easy Logs"
@@ -62,7 +62,7 @@
                
 
                 {% if all_employees|length < 2 %}
-                readonly
+                disabled
                 {% endif %}
               >
                 {% if all_employees|length > 1 %}
@@ -70,11 +70,8 @@
                 {% endif %} {% for employee in all_employees %}
                 <option
                   value="{{ employee.first_name }} {{ employee.last_name }}"
-                  {% if all_employees|length == 1 %} selected {% endif %}
-
                 >
                   {{ employee.first_name }} {{ employee.last_name }}
-
                 </option>
                 {% endfor %}
               </select>
@@ -209,7 +206,7 @@
               {{cheque_data.cheque_number}}
             </td>
             <td
-              class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border cheque-amount"
+              class="cheque-amount px-6 py-4 whitespace-nowrap text-sm text-gray-500 border cheque-amount"
             >
               {{cheque_data.cheque_amount}}
             </td>
@@ -238,17 +235,34 @@
             >
               {{cheque_data.remarks}}
             </td>
-            <td
-              class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border"
-            >
-              <div
-                class="bg-green-500 text-white px-4 py-1 cursor-pointer deposit-btn"
-                data-id="{{ cheque_data.id }}"
-              >
-                Deposit
-              </div>
-            </td>
-          </tr>
+            
+            <td class="border border-gray-300 px-2">
+                <form
+                  method="post"
+                  action="{% url 'cheque_update_status' cheque_data.id %}"
+                >
+                  {% csrf_token %}
+                  <select
+                    name="cheque_pending_status"
+                    class="mt-1 block w-full border-gray-300 shadow-sm focus:border-indigo-500 sm:text-sm py-3 "
+                    onchange="this.form.submit()"
+                  >
+                    <option
+                      value="pending"
+                      {% if  cheque_data.pending_status %}selected{% endif %}
+                    >
+                      pending
+                    </option>
+                    <option
+                      value="completed"
+                      {%if not cheque_data.pending_status %}selected{% endif %}
+                    >
+                      completed
+                    </option>
+                  </select>
+                </form>
+              </td>
+        </tr>
           {% endfor %}
         </tbody>
       </table>
@@ -299,139 +313,80 @@
         });
       });
     </script>
-
-    {% comment %} filters  {% endcomment %}
     {% comment %} <script>
       document.addEventListener("DOMContentLoaded", function () {
-        const amountFilter = document.getElementById("AmountFilter");
-        const handledByFilter = document.getElementById("handledByFilter");
-        const tableRows = document.querySelectorAll(".cheque-row");
-      
-        // Function to apply both filters
-        function applyFilters() {
-          const amountFilterValue = amountFilter.value;
-          const handledByFilterValue = handledByFilter.value.trim();
-      
-          tableRows.forEach(function (row) {
-            const amountText = row.querySelector(".cheque-amount").textContent;
-            const amount = parseInt(amountText); // Extract number from amount text
-      
-            const rowHandler = row.querySelector("td:nth-child(2)").textContent.trim(); // Get the handler in the row
-      
-            let showRow = true;
-      
-            // Check amount filter
-            if (amountFilterValue !== "all") {
-              if (amountFilterValue === "50k" && amount > 50000) {
-                showRow = false;
-              } else if (amountFilterValue === "100k" && amount > 100000) {
-                showRow = false;
-              } else if (amountFilterValue === ">100k" && amount <= 100000) {
-                showRow = false;
-              }
-            }
-      
-            // Check handled by filter
-            if (handledByFilterValue !== "all") {
-              if (rowHandler !== handledByFilterValue) {
-                showRow = false;
-              }
-            }
-      
-            // Show or hide the row based on both filters
-            row.style.display = showRow ? "" : "none";
-          });
-        }
-      
-        // Attach event listeners for both filters
-        amountFilter.addEventListener("change", applyFilters);
-        handledByFilter.addEventListener("change", applyFilters);
-      });
-      
-      // Apply filters on page load
-      applyFilters();
+        document
+          .getElementById("AmountFilter")
+          .addEventListener("change", function () {
+            var filterValue = this.value;
+            var rows = document.querySelectorAll(".cheque-row");
 
-    </script> {% endcomment %}
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const amountFilter = document.getElementById("AmountFilter");
-        const handledByFilter = document.getElementById("handledByFilter");
-        const tableRows = document.querySelectorAll(".cheque-row");
-    
-        // Function to apply both filters
-        function applyFilters() {
-          const amountFilterValue = amountFilter.value;
-          const handledByFilterValue = handledByFilter.value.trim();
-    
-          tableRows.forEach(function (row) {
-            const amountText = row.querySelector(".cheque-amount").textContent;
-            const amount = Math.floor(parseFloat(amountText.replace(/[^0-9.]/g, ""))); // Ignore decimal part
-            const rowHandler = row.querySelector("td:nth-child(2)").textContent.trim(); // Get the handler in the row
-    
-            let showRow = true;
-    
-            // Check handled by filter first
-            if (handledByFilterValue !== "all") {
-              if (rowHandler !== handledByFilterValue) {
-                showRow = false;
+            rows.forEach(function (row) {
+              var amountText = row.querySelector(".cheque-amount").textContent;
+              var amount = parseInt(amountText); // Remove non-digit characters, including commas and currency symbols
+
+              // Show all rows if "all" is selected
+              if (filterValue === "all") {
+                row.style.display = "";
+              } else if (filterValue === "50k" && amount <= 50000) {
+                row.style.display = "";
+              } else if (filterValue === "100k" && amount <= 100000) {
+                row.style.display = "";
+              } else if (filterValue === ">100k" && amount > 100000) {
+                row.style.display = "";
+              } else {
+                row.style.display = "none"; // Hide rows that don't match the criteria
               }
-            }
-    
-            // Check amount filter
-            if (amountFilterValue !== "all") {
-              if (amountFilterValue === "50k" && amount > 50000) {
-                showRow = false; // Show rows with amount <= 50,000
-              } else if (amountFilterValue === "100k" && amount > 100000) {
-                showRow = false; // Show rows with amount <= 100,000
-              } else if (amountFilterValue === ">100k" && amount <= 100000) {
-                showRow = false; // Show only rows with amount > 100,000
-              }
-            }
-    
-            // Show or hide the row based on both filters
-            row.style.display = showRow ? "" : "none";
+            });
           });
-        }
-    
-        // Attach event listeners for both filters
-        amountFilter.addEventListener("change", applyFilters);
-        handledByFilter.addEventListener("change", applyFilters);
-    
-        // Apply filters on page load
-        applyFilters();
       });
     </script>
 
-    
-
-
     <script>
-      //search 
       document.addEventListener("DOMContentLoaded", function () {
         const searchInput = document.getElementById("searchInput");
-        const tableRows = document.querySelectorAll(".cheque-row");
-      
-        searchInput.addEventListener("input", function () {
-          const searchTerm = searchInput.value.toLowerCase();
-      
-          tableRows.forEach(function (row) {
-            const rowText = row.textContent.toLowerCase();
-            if (rowText.includes(searchTerm)) {
-              row.style.display = ""; // Show row if it matches the search term
-            } else {
-              row.style.display = "none"; // Hide row if it doesn't match
-            }
-          });
+        const handlerFilter = document.getElementById("handlerFilter");
+        const table = document.getElementById("dataTable");
+        const rows = table.getElementsByTagName("tr");
+        const exportButton = document.getElementById("exportButton");
+
+        // Populate handler filter options
+        const handlers = new Set();
+        for (let i = 1; i < rows.length; i++) {
+          const handler = rows[i].getElementsByTagName("td")[1].textContent;
+          handlers.add(handler);
+        }
+        handlers.forEach((handler) => {
+          const option = document.createElement("option");
+          option.value = handler;
+          option.textContent = handler;
+          handlerFilter.appendChild(option);
         });
-      });
-      
-    </script> 
-    
 
-    <script>
-     
+        function filterTable() {
+          const searchText = searchInput.value.toLowerCase();
+          const selectedHandler = handlerFilter.value;
 
-      document.addEventListener("DOMContentLoaded", function () {
+          for (let i = 1; i < rows.length; i++) {
+            const row = rows[i];
+            const cells = row.getElementsByTagName("td");
+            let found = false;
+
+            for (let j = 0; j < cells.length; j++) {
+              const cellText = cells[j].textContent.toLowerCase();
+              if (cellText.indexOf(searchText) > -1) {
+                found = true;
+                break;
+              }
+            }
+
+            const handlerCell = cells[1].textContent;
+            const handlerMatch =
+              selectedHandler === "all" || handlerCell === selectedHandler;
+
+            row.style.display = found && handlerMatch ? "" : "none";
+          }
+        }
 
         // Excel export function
         function exportToExcel() {
@@ -487,6 +442,141 @@
         // Initial filter
         filterTable();
       });
-    </script>
+    </script> {% endcomment %}
+    {% comment %} filters  {% endcomment %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+          const amountFilter = document.getElementById("AmountFilter");
+          const handledByFilter = document.getElementById("handledByFilter");
+          const tableRows = document.querySelectorAll(".cheque-row");
+      
+          // Function to apply both filters
+          function applyFilters() {
+            const amountFilterValue = amountFilter.value;
+            const handledByFilterValue = handledByFilter.value.trim();
+      
+            tableRows.forEach(function (row) {
+              const amountText = row.querySelector(".cheque-amount").textContent;
+              const amount = Math.floor(parseFloat(amountText.replace(/[^0-9.]/g, ""))); // Ignore decimal part
+              const rowHandler = row.querySelector("td:nth-child(2)").textContent.trim(); // Get the handler in the row
+      
+              let showRow = true;
+      
+              // Check handled by filter first
+              if (handledByFilterValue !== "all") {
+                if (rowHandler !== handledByFilterValue) {
+                  showRow = false;
+                }
+              }
+      
+              // Check amount filter
+              if (amountFilterValue !== "all") {
+                if (amountFilterValue === "50k" && amount > 50000) {
+                  showRow = false; // Show rows with amount <= 50,000
+                } else if (amountFilterValue === "100k" && amount > 100000) {
+                  showRow = false; // Show rows with amount <= 100,000
+                } else if (amountFilterValue === ">100k" && amount <= 100000) {
+                  showRow = false; // Show only rows with amount > 100,000
+                }
+              }
+      
+              // Show or hide the row based on both filters
+              row.style.display = showRow ? "" : "none";
+            });
+          }
+      
+          // Attach event listeners for both filters
+          amountFilter.addEventListener("change", applyFilters);
+          handledByFilter.addEventListener("change", applyFilters);
+      
+          // Apply filters on page load
+          applyFilters();
+        });
+      </script>
+  
+  
+      <script>
+        //search 
+        document.addEventListener("DOMContentLoaded", function () {
+          const searchInput = document.getElementById("searchInput");
+          const tableRows = document.querySelectorAll(".cheque-row");
+        
+          searchInput.addEventListener("input", function () {
+            const searchTerm = searchInput.value.toLowerCase();
+        
+            tableRows.forEach(function (row) {
+              const rowText = row.textContent.toLowerCase();
+              if (rowText.includes(searchTerm)) {
+                row.style.display = ""; // Show row if it matches the search term
+              } else {
+                row.style.display = "none"; // Hide row if it doesn't match
+              }
+            });
+          });
+        });
+        
+      </script> 
+      
+  
+      <script>
+       
+  
+        document.addEventListener("DOMContentLoaded", function () {
+  
+          // Excel export function
+          function exportToExcel() {
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.table_to_sheet(table);
+            XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+            XLSX.writeFile(wb, "easy_logs_cheques.xlsx");
+          }
+  
+          // Function to update total cheque amount
+          function updateTotalChequeAmount() {
+            const rows = document.querySelectorAll("#dataTable tbody tr");
+            let total = 0;
+            rows.forEach((row) => {
+              const amountCell = row.querySelector("td:nth-child(6)");
+              if (amountCell && row.style.display !== "none") {
+                total += parseFloat(amountCell.textContent) || 0;
+              }
+            });
+            document.getElementById(
+              "totalChequeAmount"
+            ).textContent = `Total Cheque Amount: Rs. ${total.toFixed(2)}`;
+          }
+  
+          // Function to update current time
+          function updateCurrentTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            document.getElementById(
+              "currentTime"
+            ).innerHTML = `<i class="ri-time-line"></i> ${timeString}`;
+          }
+  
+          // Update total and time initially and then every second
+          updateTotalChequeAmount();
+          updateCurrentTime();
+          setInterval(updateCurrentTime, 1000);
+  
+          // Update total when table is filtered
+          searchInput.addEventListener("keyup", () => {
+            filterTable();
+            updateTotalChequeAmount();
+          });
+          handlerFilter.addEventListener("change", () => {
+            filterTable();
+            updateTotalChequeAmount();
+          });
+  
+          searchInput.addEventListener("keyup", filterTable);
+          handlerFilter.addEventListener("change", filterTable);
+          exportButton.addEventListener("click", exportToExcel);
+  
+          // Initial filter
+          filterTable();
+        });
+      </script>
   </body>
 </html>

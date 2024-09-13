@@ -21,6 +21,13 @@ urlpatterns = [
     path('update_inquiry_status/<int:inquiry_id>/', views.update_inquiry_status, name='update_inquiry_status'),
 
     path('add_cheque/', views.add_cheque , name="add_cheque"),
+    path('due_cheque_reports/', views.cheque_reports , name="due_cheque_reports"),
+    path('pending_cheque_reports/', views.pending_cheque_reports , name="pending_cheque_reports"),
+    path('completed_cheque_reports/', views.completed_cheque_reports , name="completed_cheque_reports"),
+    path('cheque/deposit/<int:cheque_id>/', views.deposit_cheque, name='deposit_cheque'),
+    path('cheque/update-status/<int:cheque_id>/', views.cheque_update_status, name='cheque_update_status'),
+
+
     
     path('delete_inquiry/<int:inquiry_id>/', views.delete_inquiry, name='delete_inquiry'),
     path('update_employee/<int:employee_id>/', views.update_employee, name='update_employee'),
