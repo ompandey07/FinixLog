@@ -1,5 +1,5 @@
 from django.contrib.auth import authenticate, login , logout
-from .models import Employee,Inquiry,Cheque
+from .models import Employee,Inquiry,Cheque,ActivityLog
 from database.models import Crm_Contacts
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -11,6 +11,8 @@ from django.utils import timezone
 import os
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
+from .utils import create_log
+
 
 
 
@@ -33,6 +35,23 @@ def prevent_admin_access(view_func):
 
 
 
+# def login_page(request):
+#     if request.method == 'POST':
+#         username = request.POST.get('username')
+#         password = request.POST.get('password')
+#         user = authenticate(request, username=username, password=password)
+#         if user is not None:
+#             login(request, user)
+#             if user.is_superuser:
+#                 return redirect('admin_dashboard')
+#             elif hasattr(user, 'employee'):  # Check if user is an employee
+#                 return redirect('users_dashboard')
+#             else:
+#                 return redirect('default_dashboard')  # Redirect to some default page if neither admin nor employee
+#         else:
+#             return render(request, "index.html", {'error': 'Invalid credentials'})
+#     return render(request, "index.html")
+
 def login_page(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -42,12 +61,12 @@ def login_page(request):
             login(request, user)
             if user.is_superuser:
                 return redirect('admin_dashboard')
-            elif hasattr(user, 'employee'):  # Check if user is an employee
+            elif hasattr(user, 'employee'):
                 return redirect('users_dashboard')
             else:
-                return redirect('default_dashboard')  # Redirect to some default page if neither admin nor employee
+                return redirect('default_dashboard')
         else:
-            return render(request, "index.html", {'error': 'Invalid credentials'})
+            return render(request, "index.html", {'error': 'Username or Password didnot match'})
     return render(request, "index.html")
 
 
@@ -160,6 +179,8 @@ def add_employee(request):
             age=age,
             profile_image=profile_image
         )
+        create_log(f"Created new employee {first_name} {last_name}", request.user)
+
 
         return redirect('admin_dashboard')
 
@@ -207,6 +228,8 @@ def add_cheque(request):
         
         # Save the cheque instance to the database
         cheque.save()
+        create_log(f"Added Cheque of '{company_name}' with cheque no: '{cheque_number}' ", request.user)
+
 
         # Redirect to a success page or return to form with a success message
         return redirect('due_cheque_reports')  # Replace with your actual success URL
@@ -276,6 +299,8 @@ def add_inquiry(request):
             remarks=remarks
         )
         inquiry.save()
+        create_log(f"Added Inquiry from  '{customer_name}'", request.user)
+
 
         # Redirect to a success page or return to form with success message
         return redirect('inquiry_status')  # Make sure to replace 'success_page' with your actual redirect URL
@@ -323,6 +348,10 @@ def update_inquiry(request,inquiry_id):
         # Validate data (add your validation logic here as needed)
         
         inquiry.save()
+        create_log(f"Updated Inquiry of customer '{inquiry.customer_name}' from company '{inquiry.company_name}' ", request.user)
+
+
+
         
 
         # Redirect to a success page or return to form with success message
@@ -421,7 +450,10 @@ def update_inquiry_status(req, inquiry_id):
         status = req.POST.get("status_of_inquiry")
         inquiry.status = status  # Set status based on selected value
         inquiry.save()
+        create_log(f"Status of {inquiry.customer_name}'s inquiry changed to {status}", req.user)
+
         return redirect('inquiry_status')  # Redirect back to the inquiry status page
+    
 
     return redirect('inquiry_status')  # Handle GET requests
 
@@ -432,6 +464,7 @@ def delete_inquiry(request, inquiry_id):
     inquiry = get_object_or_404(Inquiry, id=inquiry_id)
 
     inquiry.delete()  
+    create_log(f"deleted inquiry of customer '{inquiry.customer_name}' and company '{inquiry.company_name}'   ", request.user)
 
     # Redirect back to the manage employee page or any other page
     return redirect('inquiry_status')
@@ -440,8 +473,6 @@ def delete_inquiry(request, inquiry_id):
 
 
 
-def actyvity_log(req):
-    return render (req , "Admin/activity_log.html")
 
 
 @login_required
@@ -497,6 +528,8 @@ def update_employee(request, employee_id):
         # Save the updated data
         user.save()
         employee.save()
+        create_log(f"employee of name '{employee.first_name}{employee.last_name}' is updated", request.user)
+
 
         # Redirect back to manage employee page or any other page
         return redirect('manage_employee')
@@ -525,6 +558,8 @@ def delete_employee(request, employee_id):
     # Delete the associated user and the employee
     user = employee.user
     user.delete()  # This will also delete the employee due to the OneToOneField
+    create_log(f"employee of name '{employee.first_name}{employee.last_name}' is deleted", request.user)
+
 
     # Redirect back to the manage employee page or any other page
     return redirect('manage_employee')
@@ -686,6 +721,8 @@ def deposit_cheque(request, cheque_id):
     cheque = get_object_or_404(Cheque, id=cheque_id)
     cheque.diposited = True
     cheque.save()
+    create_log(f"cheque of company '{cheque.company_name}' disposited ", request.user)
+
     return JsonResponse({'status': 'success'}) 
 
 
@@ -699,10 +736,15 @@ def cheque_update_status(request, cheque_id):
         cheque_pending_status = request.POST.get("cheque_pending_status")
         if cheque_pending_status == "completed":
             cheque.pending_status = False
+            create_log(f"cheque of company {cheque.company_name}'s status changed to pending  ", request.user)
+
         else:
             cheque.pending_status = True
+            create_log(f"cheque of company {cheque.company_name}'s status changed to completed  ", request.user)
+
         
         cheque.save()
+
         return redirect('pending_cheque_reports')  
 
 
@@ -710,9 +752,9 @@ def cheque_update_status(request, cheque_id):
     
 # @login_required
 # @user_passes_test(lambda u: u.is_superuser)
-def user_profile(request):
+# def user_profile(request):
     
-    return render (request , "profile/user_profile.html")
+#     return render (request , "profile/user_profile.html")
 
 
 
@@ -758,6 +800,8 @@ def user_profile(request):
         # Save the updated data
         user.save()
         employee.save()
+        create_log(f"employee profile updated of '{employee.first_name}{employee.last_name}'", request.user)
+
 
         # Redirect back to manage employee page or any other page
         return redirect('logout')
@@ -796,8 +840,12 @@ def backup_database(request):
         # Check if the backup file was created successfully
         if os.path.exists(backup_path):
             # Return the JSON response with a message and the filename
+            create_log(f"backup created successfully  ", request.user)
+
             return JsonResponse({"message": "Database backup created successfully.", "backup_filename": backup_filename})
         else:
+            
+            create_log(f"Failed to create a backup  ", request.user)
             return JsonResponse({"message": "Failed to create a backup."}, status=500)
 
     return JsonResponse({"message": "Invalid request method."}, status=400)
@@ -820,8 +868,27 @@ def restore_database(request):
         if os.path.exists(temp_backup_full_path):
             # Replace the current database with the uploaded backup
             os.replace(temp_backup_full_path, database_path)
+
+            create_log(f"Database restored successfully  ", request.user)
             return JsonResponse({"message": "Database restored successfully."})
         else:
+            
+            create_log(f"Backup file not found.  ", request.user)
             return JsonResponse({"message": "Backup file not found."}, status=404)
 
     return JsonResponse({"message": "No file uploaded or invalid request."}, status=400)
+
+
+
+
+
+def activity_log(request):
+    # Check if the logs are empty
+    if not ActivityLog.objects.exists():
+        # Add two default logs
+        ActivityLog.objects.create(task="System Initialized", user=request.user, timestamp=timezone.now())
+
+    # Fetch logs ordered by the most recent
+    logs = ActivityLog.objects.all().order_by('-timestamp')
+    
+    return render(request, 'Admin/activity_log.html', {'logs': logs})

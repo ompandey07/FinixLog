@@ -1,6 +1,8 @@
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
+
 
 class Employee(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -50,3 +52,12 @@ class Cheque(models.Model):
     extra_reminder_email = models.EmailField(blank=True, null=True)
     diposited = models.BooleanField(default=False)
     pending_status = models.BooleanField(default=True)
+
+
+class ActivityLog(models.Model):
+    task = models.CharField(max_length=255)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    timestamp = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.task} - {self.timestamp}"

@@ -266,6 +266,24 @@
       </div>
     </footer>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const exportButton = document.getElementById("exportButton");
+        const table = document.getElementById("dataTable");
+    
+        // Excel export function
+        function exportToExcel() {
+          const wb = XLSX.utils.book_new(); // Create a new workbook
+          const ws = XLSX.utils.table_to_sheet(table); // Convert HTML table to sheet
+          XLSX.utils.book_append_sheet(wb, ws, "Sheet1"); // Append the sheet to the workbook
+          XLSX.writeFile(wb, "easy_logs_cheques.xlsx"); // Write and download Excel file
+        }
+    
+        // Attach event listener to export button
+        exportButton.addEventListener("click", exportToExcel);
+      });
+    </script>
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll(".deposit-btn").forEach(function (button) {
@@ -292,80 +310,7 @@
         });
       });
     </script>
-    {% comment %} <script>
-        document.addEventListener("DOMContentLoaded", function () {
-          const amountFilter = document.getElementById("AmountFilter");
-          const handledByFilter = document.getElementById("handledByFilter");
-          const tableRows = document.querySelectorAll(".cheque-row");
-      
-          // Function to apply both filters
-          function applyFilters() {
-            const amountFilterValue = amountFilter.value;
-            const handledByFilterValue = handledByFilter.value.trim();
-      
-            tableRows.forEach(function (row) {
-              const amountText = row.querySelector(".cheque-amount").textContent;
-              const amount = Math.floor(parseFloat(amountText.replace(/[^0-9.]/g, ""))); // Ignore decimal part
-              const rowHandler = row.querySelector("td:nth-child(2)").textContent.trim(); // Get the handler in the row
-      
-              let showRow = true;
-      
-              // Check handled by filter first
-              if (handledByFilterValue !== "all") {
-                if (rowHandler !== handledByFilterValue) {
-                  showRow = false;
-                }
-              }
-      
-              // Check amount filter
-              if (amountFilterValue !== "all") {
-                if (amountFilterValue === "50k" && amount > 50000) {
-                  showRow = false; // Show rows with amount <= 50,000
-                } else if (amountFilterValue === "100k" && amount > 100000) {
-                  showRow = false; // Show rows with amount <= 100,000
-                } else if (amountFilterValue === ">100k" && amount <= 100000) {
-                  showRow = false; // Show only rows with amount > 100,000
-                }
-              }
-      
-              // Show or hide the row based on both filters
-              row.style.display = showRow ? "" : "none";
-            });
-          }
-      
-          // Attach event listeners for both filters
-          amountFilter.addEventListener("change", applyFilters);
-          handledByFilter.addEventListener("change", applyFilters);
-      
-          // Apply filters on page load
-          applyFilters();
-        });
-      </script>
-      
-      
-  
-  
-      <script>
-        //search 
-        document.addEventListener("DOMContentLoaded", function () {
-          const searchInput = document.getElementById("searchInput");
-          const tableRows = document.querySelectorAll(".cheque-row");
-        
-          searchInput.addEventListener("input", function () {
-            const searchTerm = searchInput.value.toLowerCase();
-        
-            tableRows.forEach(function (row) {
-              const rowText = row.textContent.toLowerCase();
-              if (rowText.includes(searchTerm)) {
-                row.style.display = ""; // Show row if it matches the search term
-              } else {
-                row.style.display = "none"; // Hide row if it doesn't match
-              }
-            });
-          });
-        });
-        
-      </script>  {% endcomment %}
+   
       <script>
         document.addEventListener("DOMContentLoaded", function () {
           const amountFilter = document.getElementById("AmountFilter");
@@ -394,9 +339,9 @@
         
               // Apply amount filter
               if (amountFilterValue !== "all") {
-                if (amountFilterValue === "50k" && amount > 50000) {
+                if (amountFilterValue === "50k" && amount !== 50000) {
                   showRow = false; // Show rows with amount <= 50,000
-                } else if (amountFilterValue === "100k" && amount > 100000) {
+                } else if (amountFilterValue === "100k" && amount !== 100000) {
                   showRow = false; // Show rows with amount <= 100,000
                 } else if (amountFilterValue === ">100k" && amount <= 100000) {
                   showRow = false; // Show only rows with amount > 100,000
@@ -430,13 +375,7 @@
   
         document.addEventListener("DOMContentLoaded", function () {
   
-          // Excel export function
-          function exportToExcel() {
-            const wb = XLSX.utils.book_new();
-            const ws = XLSX.utils.table_to_sheet(table);
-            XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-            XLSX.writeFile(wb, "easy_logs_cheques.xlsx");
-          }
+        
   
           // Function to update total cheque amount
           function updateTotalChequeAmount() {

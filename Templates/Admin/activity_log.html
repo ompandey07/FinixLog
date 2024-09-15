@@ -1,78 +1,132 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EASY LOGS</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="shortcut icon" href="/static/images/Logo.png" type="image/x-icon">
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-</head>
-<body class="flex flex-col min-h-screen">
-    <nav class="p-4 border-b">
-        <div class="container mx-auto flex items-center justify-between">
-            <div class="flex items-center">
-                <a href="/admin_dashboard">
-                    <img src="/static/images/Logo.png" alt="Logo" class="h-8 w-8 mr-2">
-                </a>
-                <span class="text-xl font-bold">Activity LOGS</span>
-            </div>
+    <link
+      rel="shortcut icon"
+      href="{% static 'images/logo.png' %}"
+      type="image/x-icon"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="flex flex-col min-h-screen">
+    <nav class="p-4 border-b sticky top-0 bg-white">
+      <div class="container mx-auto flex items-center justify-between">
+        <div class="flex items-center">
+          <a href="/admin_dashboard">
+            <img
+              src="{% static 'images/logo.png' %}"
+              alt="Logo"
+              class="h-8 w-8 mr-2"
+            />
+          </a>
+          <span class="text-xl font-bold">Activity LOGS</span>
         </div>
+      </div>
     </nav>
 
-    <main class="flex-grow w-full overflow-x-auto">
-        <table class="w-full border-collapse border border-gray-300">
-            <thead>
-                <tr class="bg-gray-100">
-                    <th class="border border-gray-300 p-2 w-15"><i class="ri-hashtag ri-glow text-blue-500"></i> SN</th>
-                    <th class="border border-gray-300 p-2"><i class="ri-task-line ri-glow text-green-500"></i> Task</th>
-                    <th class="border border-gray-300 p-2"><i class="ri-user-3-line ri-glow text-purple-500"></i> User</th>
-                    <th class="border border-gray-300 p-2"><i class="ri-calendar-line ri-glow text-red-500"></i> Date</th>
-                    <th class="border border-gray-300 p-2"><i class="ri-time-line ri-glow text-yellow-500"></i> Time</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="border border-gray-300 p-2 text-center">1</td>
-                    <td class="border border-gray-300 p-2">Complete project proposal</td>
-                    <td class="border border-gray-300 p-2">John Doe</td>
-                    <td class="border border-gray-300 p-2">2024-09-08</td>
-                    <td class="border border-gray-300 p-2">09:00 AM</td>
-                </tr>
-                <tr>
-                    <td class="border border-gray-300 p-2 text-center">2</td>
-                    <td class="border border-gray-300 p-2">Review client feedback</td>
-                    <td class="border border-gray-300 p-2">Jane Smith</td>
-                    <td class="border border-gray-300 p-2">2024-09-09</td>
-                    <td class="border border-gray-300 p-2">02:30 PM</td>
-                </tr>
-            </tbody>
-        </table>
+    <main class="flex-grow w-full ">
+        <table class="w-full  border-collapse text-sm border border-gray-300">
+          <thead class="sticky top-[65px]">
+            <tr class="bg-gray-100 text-xs">
+            <th class="border border-gray-300 p-2 w-[80px]">
+              <i class="ri-hashtag ri-glow text-blue-500"></i> SN
+            </th>
+            <th class="border border-gray-300 p-2">
+              <i class="ri-task-line ri-glow text-green-500"></i> Task
+            </th>
+            <th class="border border-gray-300 text-center p-2">
+              <i class="ri-user-3-line ri-glow text-purple-500"></i> User
+            </th>
+            <th class="border border-gray-300 text-center p-2">
+              <i class="ri-calendar-line ri-glow text-red-500"></i> Date
+            </th>
+            <th class="border border-gray-300 text-center p-2">
+              <i class="ri-time-line ri-glow text-yellow-500"></i> Time
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in logs %}
+          <tr class="hover:bg-gray-100">
+            <td
+              class="border border-gray-300 text-xs text-center !max-w-[50px]"
+            >
+              {{ forloop.counter }}
+            </td>
+            <td
+              class="border border-gray-300 text-xs first-letter:uppercase px-2"
+            >
+              {{ log.task }}
+            </td>
+            <td class="border border-gray-300 text-xs text-center">
+              {{ log.user.username }}
+            </td>
+            <td class="border border-gray-300 text-xs text-center">
+              {{ log.timestamp|date:"Y-m-d" }}
+            </td>
+            <td class="border border-gray-300 text-xs text-center">
+              {{ log.timestamp|time:"H:i A" }}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5" class="border border-gray-300 p-2 text-center">
+              No logs available.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </main>
 
-    <footer class="text-gray-800 p-4 h-15 fixed bottom-0 w-full border-t">
-        <div class="container mx-auto flex justify-between items-center text-sm">
-            <div class="flex-shrink-0 flex items-center"" >
-                <img class="h-6 w-auto" src="/static/images/Logo.png" alt="Easy Logs"> <b class="px-4" >Easy Logs</b>
-            </div>
-            <span id="current-time"></span>
-            <span id="current-date"></span>
+    <footer
+      class="text-gray-800 p-4 h-15 sticky bg-white bottom-0 w-full border-t"
+    >
+      <div class="container mx-auto flex justify-between items-center text-sm">
+        <div class="flex-shrink-0 flex items-center">
+          <img
+            class="h-6 w-auto"
+            src="/static/images/Logo.png"
+            alt="Easy Logs"
+          />
+          <b class="px-4">Easy Logs</b>
         </div>
+        <span id="current-time"></span>
+        <span id="current-date"></span>
+      </div>
     </footer>
 
     <script>
-        function updateDateTime() {
-            const now = new Date();
-            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-            const timeElement = document.getElementById('current-time');
-            const dateElement = document.getElementById('current-date');
+      function updateDateTime() {
+        const now = new Date();
+        const days = [
+          "Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+        ];
+        const timeElement = document.getElementById("current-time");
+        const dateElement = document.getElementById("current-date");
 
-            timeElement.textContent = now.toLocaleTimeString();
-            dateElement.textContent = `${days[now.getDay()]}, ${now.toLocaleDateString()}`;
-        }
+        timeElement.textContent = now.toLocaleTimeString();
+        dateElement.textContent = `${
+          days[now.getDay()]
+        }, ${now.toLocaleDateString()}`;
+      }
 
-        updateDateTime();
-        setInterval(updateDateTime, 1000);
+      updateDateTime();
+      setInterval(updateDateTime, 1000);
     </script>
-</body>
+  </body>
 </html>

@@ -21,8 +21,8 @@
   </head>
 
   <body class="flex flex-col min-h-screen">
-    <nav class="p-4 border-b">
-      <div class="container mx-auto flex items-center justify-between">
+    <nav class="p-4 border-b sticky top-0 bg-white">
+      <div class="container  mx-auto flex items-center justify-between">
         <div class="flex items-center">
           <a href= {% if is_superuser %} '/admin_dashboard' {% else %} '/users_dashboard' {% endif %}>
             <img
@@ -36,10 +36,10 @@
       </div>
     </nav>
 
-    <main class="flex-grow w-full overflow-x-auto">
-      <table class="w-full border-collapse text-sm border border-gray-300">
-        <thead>
-          <tr class="bg-gray-100">
+    <main class="flex-grow w-full ">
+      <table class="w-full  border-collapse text-sm border border-gray-300">
+        <thead class="sticky top-[65px]">
+          <tr class="bg-gray-100 text-xs">
             <th class="border border-gray-300 w-15">
               <i class="ri-hashtag ri-glow text-blue-500"></i> SN
             </th>
@@ -174,7 +174,7 @@
       </table>
     </main>
 
-    <footer class="text-gray-800 p-4 h-15 fixed bottom-0 w-full border-t">
+    <footer class="text-gray-800 p-4 h-15 sticky bottom-0 bg-white w-full border-t">
       <div class="container mx-auto flex justify-between items-center text-sm">
         <div class="flex-shrink-0 flex items-center">
           <img

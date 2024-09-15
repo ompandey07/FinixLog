@@ -7,6 +7,8 @@ from django.urls import path
 
 
 urlpatterns = [
+    
+    
     path('', views.login_page , name="login_page"),
 
 
@@ -14,7 +16,7 @@ urlpatterns = [
     path('admin_dashboard/', views.admin_dashboard , name="admin_dashboard"),
     path('add_employee/', views.add_employee , name="add_employee"),
     path('add_inquiry/', views.add_inquiry , name="add_inquiry"),
-    path('actyvity_log/', views.actyvity_log , name="actyvity_log"),
+    path('activity_log/', views.activity_log , name="activity_log"),
     path('manage_employee/', views.manage_employee , name="manage_employee"),
     path('inquiry_status/', views.inquiry_status , name="inquiry_status"),
     path('update_inquiry/<int:inquiry_id>/', views.update_inquiry, name='update_inquiry'),
@@ -51,8 +53,14 @@ urlpatterns = [
     
 ]
 
-# Serving media files in development
+# # Serving media files in development
+# if settings.DEBUG:
+#     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
+# Serve static files in development
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
-
+# Serve media files in development
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
