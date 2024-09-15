@@ -39,6 +39,13 @@ urlpatterns = [
 
     # Users & Users Controls 
     path('users_dashboard/', views.users_dashboard , name="users_dashboard"),
+    path('user_profile/', views.user_profile , name="user_profile"),
+
+    # for backup and restore 
+    path('backup/', views.backup_database, name='backup_database'),
+    path('restore/', views.restore_database, name='restore_database'),
+
+
 
 
     

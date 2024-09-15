@@ -62,7 +62,7 @@
                
 
                 {% if all_employees|length < 2 %}
-                readonly
+                disabled
                 {% endif %}
               >
                 {% if all_employees|length > 1 %}
@@ -352,7 +352,7 @@
       applyFilters();
 
     </script> {% endcomment %}
-    <script>
+    {% comment %} <script>
       document.addEventListener("DOMContentLoaded", function () {
         const amountFilter = document.getElementById("AmountFilter");
         const handledByFilter = document.getElementById("handledByFilter");
@@ -425,7 +425,64 @@
         });
       });
       
-    </script> 
+    </script>  {% endcomment %}
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const amountFilter = document.getElementById("AmountFilter");
+        const handledByFilter = document.getElementById("handledByFilter");
+        const searchInput = document.getElementById("searchInput");
+        const tableRows = document.querySelectorAll(".cheque-row");
+      
+        // Function to apply all filters
+        function applyFilters() {
+          const amountFilterValue = amountFilter.value;
+          const handledByFilterValue = handledByFilter.value.trim();
+          const searchTerm = searchInput.value.toLowerCase();
+      
+          tableRows.forEach(function (row) {
+            const amountText = row.querySelector(".cheque-amount").textContent;
+            const amount = Math.floor(parseFloat(amountText.replace(/[^0-9.]/g, ""))); // Ignore decimal part
+            const rowHandler = row.querySelector("td:nth-child(2)").textContent.trim(); // Get the handler in the row
+            const rowText = row.textContent.toLowerCase(); // Text for search filter
+      
+            let showRow = true;
+      
+            // Apply handled by filter
+            if (handledByFilterValue !== "all" && rowHandler !== handledByFilterValue) {
+              showRow = false;
+            }
+      
+            // Apply amount filter
+            if (amountFilterValue !== "all") {
+              if (amountFilterValue === "50k" && amount > 50000) {
+                showRow = false; // Show rows with amount <= 50,000
+              } else if (amountFilterValue === "100k" && amount > 100000) {
+                showRow = false; // Show rows with amount <= 100,000
+              } else if (amountFilterValue === ">100k" && amount <= 100000) {
+                showRow = false; // Show only rows with amount > 100,000
+              }
+            }
+      
+            // Apply search filter (search within text content of row)
+            if (!rowText.includes(searchTerm)) {
+              showRow = false; // Hide row if it doesn't match the search term
+            }
+      
+            // Show or hide the row based on all filters
+            row.style.display = showRow ? "" : "none";
+          });
+        }
+      
+        // Attach event listeners for filters and search
+        amountFilter.addEventListener("change", applyFilters);
+        handledByFilter.addEventListener("change", applyFilters);
+        searchInput.addEventListener("input", applyFilters);
+      
+        // Apply filters on page load
+        applyFilters();
+      });
+      
+    </script>
     
 
     <script>

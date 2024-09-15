@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UPDATE EMPLOYEE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/css/employee.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="shortcut icon"
+      href="/static/images/Logo.png"
+      type="image/x-icon"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.28.0/feather.min.js"></script>
+  </head>
+  <body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="w-full max-w-3xl p-8 bg-white shadow-lg">
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="flex flex-col items-center mb-8">
+          <div
+            id="image-preview"
+            class="w-32 h-32 overflow-hidden bg-gray-200 rounded-full mb-4 flex items-center justify-center"
+          >
+            {% if employee.profile_image %}
+            <img
+              src="{{ employee.profile_image.url }}"
+              alt="{{ employee.first_name }} {{ employee.last_name }}"
+              class="size-full rounded-full object-cover"
+            />
+            {% else %}
+            <img
+              src="/static/images/default_user.png"
+              alt="Default Profile"
+              class="size-full rounded-full object-cover"
+            />
+            {% endif %}
+          </div>
+          <label for="image-upload" class="cursor-pointer px-4 py-2">
+            <i class="ri-upload-cloud-line text-blue-500 text-5xl"></i>
+          </label>
+          <input
+            id="image-upload"
+            name="profile_image"
+            type="file"
+            accept="image/*"
+            class="hidden"
+          />
+        </div>
+
+        <div class="grid grid-cols-2 gap-6">
+          <div class="flex items-center">
+            <i data-feather="user" class="mr-2 text-gray-500"></i>
+            <input
+              type="text"
+              name="first_name"
+              placeholder="First Name"
+              value="{{ employee.first_name }}"
+              class="w-full p-2 bg-gray-100"
+              readonly
+            />
+          </div>
+          <div class="flex items-center">
+            <i data-feather="user" class="mr-2 text-gray-500"></i>
+            <input
+              type="text"
+              name="last_name"
+              value="{{ employee.last_name }}"
+              placeholder="Last Name"
+              class="w-full p-2 bg-gray-100"
+              readonly
+            />
+          </div>
+          <div class="flex items-center">
+            <i data-feather="mail" class="mr-2 text-gray-500"></i>
+            <input
+              type="email"
+              name="email"
+              value="{{ employee.email }}"
+              placeholder="Email"
+              class="w-full p-2 bg-gray-100"
+              required
+            />
+          </div>
+          <div class="flex items-center">
+            <i data-feather="map-pin" class="mr-2 text-gray-500"></i>
+            <input
+              type="text"
+              name="address"
+              value="{{ employee.address }}"
+              placeholder="Address"
+              class="w-full p-2 bg-gray-100"
+              required
+            />
+          </div>
+          <div class="flex items-center">
+            <i data-feather="phone" class="mr-2 text-gray-500"></i>
+            <input
+              type="tel"
+              name="contact"
+              value="{{ employee.contact }}"
+              placeholder="Contact"
+              class="w-full p-2 bg-gray-100"
+              required
+            />
+          </div>
+          <div class="flex items-center">
+            <i data-feather="calendar" class="mr-2 text-gray-500"></i>
+            <input
+              type="number"
+              name="age"
+              value="{{ employee.age }}"
+              placeholder="Age"
+              class="w-full p-2 bg-gray-100"
+              required
+            />
+          </div>
+          <div class="flex items-center relative">
+            <i data-feather="user" class="mr-2 text-gray-500"></i>
+            <input
+              type="text"
+              name="username"
+              value="{{ username }}"
+              placeholder="Username"
+              class="w-full p-2 bg-gray-100"
+              required
+            />
+          </div>
+          <div class="flex items-center relative">
+            <i data-feather="lock" class="mr-2 text-gray-500"></i>
+            <input
+              type="password"
+              name="password"
+              id="password"
+              title="leave password field empty if you dont want to change password"
+              placeholder="Password"
+              class="w-full p-2 bg-gray-100"
+            />
+            <button
+              type="button"
+              id="togglePassword"
+              class="absolute right-2 top-1/2 transform -translate-y-1/2"
+            >
+              <i data-feather="eye" class="text-gray-500"></i>
+            </button>
+          </div>
+          <div class="flex items-center relative">
+            <i data-feather="lock" class="mr-2 text-gray-500"></i>
+            <input
+              type="password"
+              name="confirm_password"
+              id="confirmPassword"
+              placeholder="Confirm Password"
+              class="w-full p-2 bg-gray-100"
+            />
+            <button
+              type="button"
+              id="toggleConfirmPassword"
+              class="absolute right-2 top-1/2 transform -translate-y-1/2"
+            >
+              <i data-feather="eye" class="text-gray-500"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-8 flex justify-center">
+          <button type="submit" class="bg-blue-500 text-white px-6 py-2">
+            Save
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <script src="/static/javascripts/employee.js"></script>
+    <script src="/static/javascripts/employee.js"></script>
+    <script>
+      // Check if an error message exists and show it as an alert
+      const error = "{{ error|escapejs }}";
+      if (error) {
+        alert(error);
+      }
+    </script>
+    <script>
+      const togglePassword = document.querySelector("#togglePassword");
+      const toggleConfirmPassword = document.querySelector(
+        "#toggleConfirmPassword"
+      );
+      const passwordField = document.querySelector("#password");
+      const confirmPasswordField = document.querySelector("#confirmPassword");
+
+      toggleConfirmPassword.addEventListener("click", function () {
+        // Toggle the type attribute
+        const type =
+          confirmPasswordField.getAttribute("type") === "password"
+            ? "text"
+            : "password";
+        confirmPasswordField.setAttribute("type", type);
+
+        // Toggle the icon (optional, to change the eye icon when visible)
+        this.querySelector("i").classList.toggle("feather-eye");
+        this.querySelector("i").classList.toggle("feather-eye-off");
+      });
+      togglePassword.addEventListener("click", function () {
+        // Toggle the type attribute
+        const type =
+          passwordField.getAttribute("type") === "password"
+            ? "text"
+            : "password";
+        passwordField.setAttribute("type", type);
+
+        // Toggle the icon (optional, to change the eye icon when visible)
+        this.querySelector("i").classList.toggle("feather-eye");
+        this.querySelector("i").classList.toggle("feather-eye-off");
+      });
+    </script>
+  </body>
+</html>

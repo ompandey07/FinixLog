@@ -6,6 +6,13 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from django.http import HttpResponseRedirect
+import shutil
+from django.utils import timezone
+import os
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+
+
 
 
 
@@ -56,7 +63,7 @@ def is_superuser(user):
 @user_passes_test(is_superuser)
 def admin_dashboard(request):
     inquiries_count = Inquiry.objects.count()
-    pending_cheques_count = Cheque.objects.filter(pending_status=True).count()  # Adjust the filter as necessary
+    pending_cheques_count = Cheque.objects.filter(pending_status=True, diposited=False).count()  # Adjust the filter as necessary
     employees_count = Employee.objects.count()
     contacts_count = Crm_Contacts.objects.count()
     
@@ -82,10 +89,20 @@ def users_dashboard(request):
     user = request.user
     employee = Employee.objects.filter(user=user).first() 
   
-    inquiries_count = Inquiry.objects.count()
-    pending_cheques_count = Cheque.objects.filter(pending_status=True).count()  # Adjust the filter as necessary
+    # inquiries_count = Inquiry.objects.filter(called_received_by=request.user).count
+    # pending_cheques_count = Cheque.objects.filter(pending_status=True).count()  # Adjust the filter as necessary
     employees_count = Employee.objects.count()
     contacts_count = Crm_Contacts.objects.count()
+
+    employee = Employee.objects.filter(user=request.user).first()
+    if employee:
+            full_name = f"{employee.first_name} {employee.last_name}"
+            pending_cheques_count = Cheque.objects.filter(
+                handled_by=full_name, diposited=False
+            ).count()
+            inquiries_count = Inquiry.objects.filter(
+                called_received_by=full_name
+            ).count()
 
     
 
@@ -517,70 +534,149 @@ def delete_employee(request, employee_id):
 
 @login_required
 # @user_passes_test(lambda u: u.is_superuser)
-def cheque_reports(request):
-    all_cheques = Cheque.objects.filter(diposited=False)
-    all_employees = Employee.objects.all()
-    context = {
-        'all_cheques': all_cheques,
-        'is_superuser': request.user.is_superuser,  
+# def cheque_reports(request):
+#     all_cheques = Cheque.objects.filter(diposited=False)
+#     all_employees = Employee.objects.all()
+#     context = {
+#         'all_cheques': all_cheques,
+#         'is_superuser': request.user.is_superuser,  
 
 
-    }
+#     }
 
-    # Check if the user is a superuser or an employee
-    if request.user.is_superuser:
-        context['all_employees'] = all_employees
-    else:
-        # If the user is not an admin, filter to only their employee
-        employee = Employee.objects.filter(user=request.user).first()
-        context['all_employees'] = [employee] if employee else []  # Ensure there's a list
+#     # Check if the user is a superuser or an employee
+#     if request.user.is_superuser:
+#         context['all_employees'] = all_employees
+#     else:
+#         # If the user is not an admin, filter to only their employee
+#         employee = Employee.objects.filter(user=request.user).first()
+#         context['all_employees'] = [employee] if employee else []  # Ensure there's a list
 
 
     
-    return render (request , "cheque/cheque_reports.html",context)
+#     return render (request , "cheque/cheque_reports.html",context)
+
+def cheque_reports(request):
+    all_employees = Employee.objects.all()
+    
+    # Check if the user is a superuser or an employee
+    if request.user.is_superuser:
+        # Superuser sees all cheques
+        all_cheques = Cheque.objects.filter(diposited=False)
+    else:
+        # Non-superusers (employees) only see cheques handled by them
+        employee = Employee.objects.filter(user=request.user).first()
+        if employee:
+            full_name = f"{employee.first_name} {employee.last_name}"
+            all_cheques = Cheque.objects.filter(handled_by=full_name, diposited=False)
+        else:
+            all_cheques = []  # No employee record, no cheques to show
+
+    context = {
+        'all_cheques': all_cheques,
+        'is_superuser': request.user.is_superuser,
+        'all_employees': all_employees if request.user.is_superuser else [employee] if employee else [],
+    }
+    
+    return render(request, "cheque/cheque_reports.html", context)
 
 @login_required
 # @user_passes_test(lambda u: u.is_superuser)
+# def pending_cheque_reports(request):
+#     all_cheques = Cheque.objects.filter(diposited=True,pending_status=True)
+#     all_employees = Employee.objects.all()
+
+#     context = {
+#         'all_cheques': all_cheques,
+#         'is_superuser': request.user.is_superuser,  
+
+
+#     }
+
+#     # Check if the user is a superuser or an employee
+#     if request.user.is_superuser:
+#         context['all_employees'] = all_employees
+#     else:
+#         # If the user is not an admin, filter to only their employee
+#         employee = Employee.objects.filter(user=request.user).first()
+#         context['all_employees'] = [employee] if employee else []  # Ensure there's a list
+#     return render (request , "cheque/pending_cheque_reports.html",context)
+
+
+
+@login_required
 def pending_cheque_reports(request):
-    all_cheques = Cheque.objects.filter(diposited=True,pending_status=True)
     all_employees = Employee.objects.all()
-
-    context = {
-        'all_cheques': all_cheques,
-        'is_superuser': request.user.is_superuser,  
-
-
-    }
 
     # Check if the user is a superuser or an employee
     if request.user.is_superuser:
-        context['all_employees'] = all_employees
+        # Superuser sees all pending cheques
+        all_cheques = Cheque.objects.filter(diposited=True, pending_status=True)
     else:
-        # If the user is not an admin, filter to only their employee
+        # Non-superusers (employees) only see pending cheques handled by them
         employee = Employee.objects.filter(user=request.user).first()
-        context['all_employees'] = [employee] if employee else []  # Ensure there's a list
-    return render (request , "cheque/pending_cheque_reports.html",context)
+        if employee:
+            full_name = f"{employee.first_name} {employee.last_name}"
+            all_cheques = Cheque.objects.filter(
+                handled_by=full_name, diposited=True, pending_status=True
+            )
+        else:
+            all_cheques = []  # No employee record, no cheques to show
+
+    context = {
+        'all_cheques': all_cheques,
+        'is_superuser': request.user.is_superuser,
+        'all_employees': all_employees if request.user.is_superuser else [employee] if employee else [],
+    }
+
+    return render(request, "cheque/pending_cheque_reports.html", context)
+
 
 
 @login_required
 # @user_passes_test(lambda u: u.is_superuser)
+# def completed_cheque_reports(request):
+#     all_cheques = Cheque.objects.filter(diposited=True,pending_status=False)
+#     all_employees = Employee.objects.all()
+
+#     context = {
+#         'all_cheques': all_cheques,
+
+#     }
+
+#     # Check if the user is a superuser or an employee
+#     if request.user.is_superuser:
+#         context['all_employees'] = all_employees
+#     else:
+#         # If the user is not an admin, filter to only their employee
+#         employee = Employee.objects.filter(user=request.user).first()
+#         context['all_employees'] = [employee] if employee else []  # Ensure there's a list
+#     return render (request , "cheque/completed_cheque_reports.html",context)
+
 def completed_cheque_reports(request):
-    all_cheques = Cheque.objects.filter(diposited=True,pending_status=False)
     all_employees = Employee.objects.all()
-
-    context = {
-        'all_cheques': all_cheques,
-
-    }
 
     # Check if the user is a superuser or an employee
     if request.user.is_superuser:
-        context['all_employees'] = all_employees
+        # Superuser sees all completed cheques
+        all_cheques = Cheque.objects.filter(diposited=True, pending_status=False)
     else:
-        # If the user is not an admin, filter to only their employee
+        # Non-superusers (employees) only see completed cheques handled by them
         employee = Employee.objects.filter(user=request.user).first()
-        context['all_employees'] = [employee] if employee else []  # Ensure there's a list
-    return render (request , "cheque/completed_cheque_reports.html",context)
+        if employee:
+            full_name = f"{employee.first_name} {employee.last_name}"
+            all_cheques = Cheque.objects.filter(
+                handled_by=full_name, diposited=True, pending_status=False
+            )
+        else:
+            all_cheques = []  # No employee record, no cheques to show
+
+    context = {
+        'all_cheques': all_cheques,
+        'all_employees': all_employees if request.user.is_superuser else [employee] if employee else [],
+    }
+
+    return render(request, "cheque/completed_cheque_reports.html", context)
 
 
 
@@ -609,3 +705,123 @@ def cheque_update_status(request, cheque_id):
         cheque.save()
         return redirect('pending_cheque_reports')  
 
+
+
+    
+# @login_required
+# @user_passes_test(lambda u: u.is_superuser)
+def user_profile(request):
+    
+    return render (request , "profile/user_profile.html")
+
+
+
+@login_required
+@prevent_admin_access
+def user_profile(request):
+    # Get the employee object based on the ID
+    employee = Employee.objects.filter(user=request.user).first()
+    user = employee.user  # Get the related user
+
+    if request.method == 'POST':
+        # Get form data
+        # employee.first_name = request.POST.get('first_name')
+        # employee.last_name = request.POST.get('last_name')
+        employee.email = request.POST.get('email')
+        employee.address = request.POST.get('address')
+        employee.contact = request.POST.get('contact')
+        employee.age = request.POST.get('age')
+
+        user.username = request.POST.get('username')  # Update the associated user's username
+        user.email = request.POST.get('email')  # Update the associated user's email
+
+        # Get the passwords from the form
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
+
+        # Validate password fields
+        if password:  # Check if password field is provided
+            if password != confirm_password:
+                return render(request, "profile/user_profile.html", {
+                    'employee': employee,
+                    'error': 'Passwords do not match',  # Pass error message
+                    'username': user.username,
+                })
+            else:
+                # Only update the password if it is provided and valid
+                user.set_password(password)
+
+        # Handle profile image update (optional)
+        if 'profile_image' in request.FILES:
+            employee.profile_image = request.FILES['profile_image']
+
+        # Save the updated data
+        user.save()
+        employee.save()
+
+        # Redirect back to manage employee page or any other page
+        return redirect('logout')
+
+    # Pass the employee object to the template for displaying current data
+    context = {
+        'employee': employee,
+        'username': user.username,  # Pass the username to the template
+        'password': user.password
+
+
+    }
+
+    return render(request, "profile/user_profile.html", context)
+
+
+
+def backup_database(request):
+    if request.method == 'POST':
+        # Define the path to your current SQLite database
+        database_path = settings.DATABASES['default']['NAME']
+
+        # Define the path for the backup file in the media folder
+        backup_dir = os.path.join(settings.MEDIA_ROOT, 'backups')
+        if not os.path.exists(backup_dir):
+            os.makedirs(backup_dir)
+
+        # Create a backup filename with a timestamp
+        timestamp = timezone.now().strftime('%Y%m%d%H%M%S')
+        backup_filename = f"backup_{timestamp}.sqlite3"
+        backup_path = os.path.join(backup_dir, backup_filename)
+
+        # Copy the database to the backup path
+        shutil.copy2(database_path, backup_path)
+
+        # Check if the backup file was created successfully
+        if os.path.exists(backup_path):
+            # Return the JSON response with a message and the filename
+            return JsonResponse({"message": "Database backup created successfully.", "backup_filename": backup_filename})
+        else:
+            return JsonResponse({"message": "Failed to create a backup."}, status=500)
+
+    return JsonResponse({"message": "Invalid request method."}, status=400)
+
+
+def restore_database(request):
+    if request.method == 'POST' and request.FILES.get('backup_file'):
+        # Get the uploaded file
+        backup_file = request.FILES['backup_file']
+
+        # Define the path to the current SQLite database
+        database_path = settings.DATABASES['default']['NAME']
+
+        # Save the uploaded backup file temporarily
+        fs = FileSystemStorage()
+        temp_backup_path = fs.save(backup_file.name, backup_file)
+        temp_backup_full_path = fs.path(temp_backup_path)  # Get the full path of the saved backup
+
+        # Check if the uploaded backup file exists
+        if os.path.exists(temp_backup_full_path):
+            # Replace the current database with the uploaded backup
+            os.replace(temp_backup_full_path, database_path)
+            return JsonResponse({"message": "Database restored successfully."})
+        else:
+            return JsonResponse({"message": "Backup file not found."}, status=404)
+
+    return JsonResponse({"message": "No file uploaded or invalid request."}, status=400)
