@@ -60,8 +60,11 @@ def login_page(request):
         if user is not None:
             login(request, user)
             if user.is_superuser:
+                create_log('logged in ',request.user)
                 return redirect('admin_dashboard')
+                
             elif hasattr(user, 'employee'):
+                create_log('logged in ',request.user)
                 return redirect('users_dashboard')
             else:
                 return redirect('default_dashboard')
