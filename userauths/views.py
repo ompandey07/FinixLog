@@ -34,24 +34,6 @@ def prevent_admin_access(view_func):
     return _wrapped_view
 
 
-
-# def login_page(request):
-#     if request.method == 'POST':
-#         username = request.POST.get('username')
-#         password = request.POST.get('password')
-#         user = authenticate(request, username=username, password=password)
-#         if user is not None:
-#             login(request, user)
-#             if user.is_superuser:
-#                 return redirect('admin_dashboard')
-#             elif hasattr(user, 'employee'):  # Check if user is an employee
-#                 return redirect('users_dashboard')
-#             else:
-#                 return redirect('default_dashboard')  # Redirect to some default page if neither admin nor employee
-#         else:
-#             return render(request, "index.html", {'error': 'Invalid credentials'})
-#     return render(request, "index.html")
-
 def login_page(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -97,8 +79,7 @@ def admin_dashboard(request):
         'employees_count': employees_count,
         'contacts_count': contacts_count,
     }
-    
-    
+        
     return render(request, 'Admin/admin_dashboard.html',context)
 
 
@@ -125,8 +106,6 @@ def users_dashboard(request):
             inquiries_count = Inquiry.objects.filter(
                 called_received_by=full_name
             ).count()
-
-    
 
     # Prepare the context
     context = {
@@ -370,30 +349,6 @@ def update_inquiry(request,inquiry_id):
 
 
 
-# @login_required
-# # @user_passes_test(lambda u: u.is_superuser)
-# def inquiry_status(req):
-#     all_inquiry = Inquiry.objects.all()
-#     all_employees = Employee.objects.all()
-
-#     context = {
-#         'all_inquiry': all_inquiry,
-#         'is_superuser': req.user.is_superuser,  # Add this line
-
-#     }
-
-    
-
-#     # Check if the user is a superuser or an employee
-#     if req.user.is_superuser:
-#         context['all_employees'] = all_employees
-#     else:
-#         # If the user is not an admin, filter to only their employee
-#         employee = Employee.objects.filter(user=req.user).first()
-#         context['all_employees'] = [employee] if employee else []  # Ensure there's a list
-#     return render (req , "inquiry/inquiry_status.html",context)
-
-
 @login_required
 def inquiry_status(req):
     # Get all employees
@@ -431,20 +386,6 @@ def inquiry_status(req):
 
 
 
-
-
-# @login_required
-# def update_inquiry_status(req, inquiry_id):
-#     inquiry = Inquiry.objects.get(id=inquiry_id)
-    
-#     if req.method == "POST":
-#         status = req.POST.get("status_of_inquiry")
-#         inquiry.is_completed = (status == "completed")  # Set is_completed based on selected status
-#         inquiry.save()
-#         return redirect('inquiry_status')  # Redirect back to the inquiry status page
-
-#     return redirect('inquiry_status')  # Handle GET requests
-
 @login_required
 def update_inquiry_status(req, inquiry_id):
     inquiry = Inquiry.objects.get(id=inquiry_id)
@@ -460,6 +401,8 @@ def update_inquiry_status(req, inquiry_id):
 
     return redirect('inquiry_status')  # Handle GET requests
 
+
+
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def delete_inquiry(request, inquiry_id):
@@ -471,9 +414,6 @@ def delete_inquiry(request, inquiry_id):
 
     # Redirect back to the manage employee page or any other page
     return redirect('inquiry_status')
-
-
-
 
 
 
@@ -571,29 +511,6 @@ def delete_employee(request, employee_id):
 
 
 @login_required
-# @user_passes_test(lambda u: u.is_superuser)
-# def cheque_reports(request):
-#     all_cheques = Cheque.objects.filter(diposited=False)
-#     all_employees = Employee.objects.all()
-#     context = {
-#         'all_cheques': all_cheques,
-#         'is_superuser': request.user.is_superuser,  
-
-
-#     }
-
-#     # Check if the user is a superuser or an employee
-#     if request.user.is_superuser:
-#         context['all_employees'] = all_employees
-#     else:
-#         # If the user is not an admin, filter to only their employee
-#         employee = Employee.objects.filter(user=request.user).first()
-#         context['all_employees'] = [employee] if employee else []  # Ensure there's a list
-
-
-    
-#     return render (request , "cheque/cheque_reports.html",context)
-
 def cheque_reports(request):
     all_employees = Employee.objects.all()
     
@@ -617,28 +534,6 @@ def cheque_reports(request):
     }
     
     return render(request, "cheque/cheque_reports.html", context)
-
-@login_required
-# @user_passes_test(lambda u: u.is_superuser)
-# def pending_cheque_reports(request):
-#     all_cheques = Cheque.objects.filter(diposited=True,pending_status=True)
-#     all_employees = Employee.objects.all()
-
-#     context = {
-#         'all_cheques': all_cheques,
-#         'is_superuser': request.user.is_superuser,  
-
-
-#     }
-
-#     # Check if the user is a superuser or an employee
-#     if request.user.is_superuser:
-#         context['all_employees'] = all_employees
-#     else:
-#         # If the user is not an admin, filter to only their employee
-#         employee = Employee.objects.filter(user=request.user).first()
-#         context['all_employees'] = [employee] if employee else []  # Ensure there's a list
-#     return render (request , "cheque/pending_cheque_reports.html",context)
 
 
 
@@ -672,25 +567,6 @@ def pending_cheque_reports(request):
 
 
 @login_required
-# @user_passes_test(lambda u: u.is_superuser)
-# def completed_cheque_reports(request):
-#     all_cheques = Cheque.objects.filter(diposited=True,pending_status=False)
-#     all_employees = Employee.objects.all()
-
-#     context = {
-#         'all_cheques': all_cheques,
-
-#     }
-
-#     # Check if the user is a superuser or an employee
-#     if request.user.is_superuser:
-#         context['all_employees'] = all_employees
-#     else:
-#         # If the user is not an admin, filter to only their employee
-#         employee = Employee.objects.filter(user=request.user).first()
-#         context['all_employees'] = [employee] if employee else []  # Ensure there's a list
-#     return render (request , "cheque/completed_cheque_reports.html",context)
-
 def completed_cheque_reports(request):
     all_employees = Employee.objects.all()
 
@@ -750,14 +626,6 @@ def cheque_update_status(request, cheque_id):
 
         return redirect('pending_cheque_reports')  
 
-
-
-    
-# @login_required
-# @user_passes_test(lambda u: u.is_superuser)
-# def user_profile(request):
-    
-#     return render (request , "profile/user_profile.html")
 
 
 

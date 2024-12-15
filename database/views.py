@@ -3,7 +3,7 @@ from .models import Crm_Contacts , Crm_Notes , Event
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 import json
-
+from userauths.utils import create_log
 
 
 
@@ -26,7 +26,8 @@ def create_contact(request):
             address=address,
             website=website,
             designaton=designaton
-        )                
+        )
+        create_log(f"Contact Has Been Created", request.user)                
         return redirect('create_contact')    
     # For GET request, render the form and table
     contacts = Crm_Contacts.objects.all()  # Fetch all contacts to display in the table
@@ -53,7 +54,7 @@ def edit(request, contact_id):
         contact.address = request.POST.get('address')
         contact.website = request.POST.get('website')
         contact.designaton = request.POST.get('designaton')
-
+        create_log(f"Contact Has Been Updated", request.user)
         contact.save()
         return JsonResponse({'status': 'success'})
     else:
@@ -69,6 +70,7 @@ def create_notes(request):
           note_title = note_title,
           note_content = note_content
       )
+      create_log(f"Note Has Been Created", request.user)
       return redirect ('create_notes')
 
     notes = Crm_Notes.objects.all()
