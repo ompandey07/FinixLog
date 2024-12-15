@@ -128,7 +128,7 @@
 <body>
     <div class="app-container">
         <header class="app-header">
-            <a href="/admin_dashboard">
+            <a href="{% if is_superuser %} '/admin_dashboard' {% else %} '/users_dashboard' {% endif %}">
                 <img
                 src="/static/images/Logo.png"
                 alt="logo"

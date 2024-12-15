@@ -211,7 +211,7 @@
   <header class="sticky-header">
     <div class="container">
       <div class="d-flex justify-content-between align-items-center">
-        <a class="navbar-brand" href="/admin_dashboard">
+        <a class="navbar-brand" href="{% if is_superuser %} '/admin_dashboard' {% else %} '/users_dashboard' {% endif %}">
           <img src="/static/images/Logo.png" alt="" id="nav-logo">
         </a>
         <h2 class="m-0" style="color: #3498db"><i class="ri-contacts-book-2-fill"></i> EASY LOGS CONTACTS</h2>

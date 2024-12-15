@@ -123,7 +123,7 @@
 <body>
   <div class="content-wrapper">
     <nav class="navbar navbar-light bg-light">
-      <a class="navbar-brand" href="/admin_dashboard">
+      <a class="navbar-brand" href="{% if is_superuser %} '/admin_dashboard' {% else %} '/users_dashboard' {% endif %}">
         <img src="/static/images/Logo.png" alt="" id="nav-logo">
       </a>
       <h2 class="mx-auto"><i class="ri-book-line" style="color: #007bff;" ></i> EASY LOGS NOTES</h2>

@@ -19,7 +19,6 @@ body {
     box-shadow: 0px 106px 42px rgba(0, 0, 0, 0.01),
       0px 59px 36px rgba(0, 0, 0, 0.05), 0px 26px 26px rgba(0, 0, 0, 0.09),
       0px 7px 15px rgba(0, 0, 0, 0.1), 0px 0px 0px rgba(0, 0, 0, 0.1);
-    border-radius: 11px;
     font-family: "Inter", sans-serif;
   }
 
@@ -35,7 +34,6 @@ body {
     border: 1px solid #f7f7f8;
     filter: drop-shadow(0px 0.5px 0.5px #efefef)
       drop-shadow(0px 1px 0.5px rgba(239, 239, 239, 0.5));
-    border-radius: 11px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -87,7 +85,6 @@ body {
     width: auto;
     height: 40px;
     padding: 0 0 0 40px;
-    border-radius: 7px;
     outline: none;
     border: 1px solid #e5e5e5;
     filter: drop-shadow(0px 1px 0px #efefef)
@@ -106,7 +103,6 @@ body {
     height: 40px;
     border: 0;
     background: #115dfc;
-    border-radius: 7px;
     outline: none;
     color: #ffffff;
     cursor: pointer;
@@ -120,7 +116,6 @@ body {
     justify-content: center;
     gap: 10px;
     background: #ffffff;
-    border-radius: 7px;
     outline: none;
     color: #242424;
     border: 1px solid #e5e5e5;
@@ -137,7 +132,6 @@ body {
     justify-content: center;
     gap: 10px;
     background: #212121;
-    border-radius: 7px;
     outline: none;
     color: #ffffff;
     border: 1px solid #e5e5e5;

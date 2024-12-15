@@ -12,11 +12,7 @@ import os
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from .utils import create_log
-
-
-
-
-
+from django.contrib.auth.models import User
 
 
 
@@ -34,7 +30,22 @@ def prevent_admin_access(view_func):
     return _wrapped_view
 
 
+
+def create_default_user():
+    """Creates a default user with specific credentials if not exists."""
+    username = "admin@admin.com"
+    password = "admin@1200"
+    
+    # Check if the user already exists
+    if not User.objects.filter(username=username).exists():
+        User.objects.create_superuser(username=username, email=username, password=password)
+
+
+
 def login_page(request):
+    # Ensure the default user exists before processing login
+    create_default_user()
+
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -42,16 +53,16 @@ def login_page(request):
         if user is not None:
             login(request, user)
             if user.is_superuser:
-                create_log('logged in ',request.user)
+                create_log('logged in', request.user)
                 return redirect('admin_dashboard')
-                
+
             elif hasattr(user, 'employee'):
-                create_log('logged in ',request.user)
+                create_log('logged in', request.user)
                 return redirect('users_dashboard')
             else:
                 return redirect('default_dashboard')
         else:
-            return render(request, "index.html", {'error': 'Username or Password didnot match'})
+            return render(request, "index.html", {'error': 'Username or Password did not match'})
     return render(request, "index.html")
 
 
@@ -60,8 +71,13 @@ def logout_view(request):
     return redirect('login_page')
 
 
+
+
 def is_superuser(user):
     return user.is_superuser
+
+
+
 
 @login_required
 @user_passes_test(is_superuser)
@@ -116,8 +132,7 @@ def users_dashboard(request):
         'contacts_count': contacts_count,
 
 
-    }
-    
+    }    
     return render(request, "Users/users_dashboard.html", context)
 
 
@@ -162,14 +177,10 @@ def add_employee(request):
             profile_image=profile_image
         )
         create_log(f"Created new employee {first_name} {last_name}", request.user)
-
-
         return redirect('admin_dashboard')
-
     return render(request, 'Admin/add_employee.html')
 
     
-
 
 
 
@@ -177,12 +188,9 @@ def add_employee(request):
 # @user_passes_test(lambda u: u.is_superuser)
 def add_cheque(request):
     all_employees = Employee.objects.all()
-
     if request.method == 'POST':
         # Get data from the form submission
         handled_by = request.POST.get('handled_by')
-
-
         company_name = request.POST.get('companyName')
         bank_name = request.POST.get('bankName')
         cheque_number = request.POST.get('chequeNumber')
@@ -212,7 +220,6 @@ def add_cheque(request):
         cheque.save()
         create_log(f"Added Cheque of '{company_name}' with cheque no: '{cheque_number}' ", request.user)
 
-
         # Redirect to a success page or return to form with a success message
         return redirect('due_cheque_reports')  # Replace with your actual success URL
     context = {
@@ -225,7 +232,6 @@ def add_cheque(request):
         # If the user is not an admin, filter to only their employee
         employee = Employee.objects.filter(user=request.user).first()
         context['all_employees'] = [employee] if employee else []  # Ensure there's a list
-
 
     # Render the form in GET request
     return render(request, 'cheque/add_cheque.html',context)
@@ -332,10 +338,6 @@ def update_inquiry(request,inquiry_id):
         inquiry.save()
         create_log(f"Updated Inquiry of customer '{inquiry.customer_name}' from company '{inquiry.company_name}' ", request.user)
 
-
-
-        
-
         # Redirect to a success page or return to form with success message
         return redirect('inquiry_status')  # Make sure to replace 'success_page' with your actual redirect URL
     context = {
@@ -397,8 +399,6 @@ def update_inquiry_status(req, inquiry_id):
         create_log(f"Status of {inquiry.customer_name}'s inquiry changed to {status}", req.user)
 
         return redirect('inquiry_status')  # Redirect back to the inquiry status page
-    
-
     return redirect('inquiry_status')  # Handle GET requests
 
 
@@ -411,10 +411,8 @@ def delete_inquiry(request, inquiry_id):
 
     inquiry.delete()  
     create_log(f"deleted inquiry of customer '{inquiry.customer_name}' and company '{inquiry.company_name}'   ", request.user)
-
     # Redirect back to the manage employee page or any other page
     return redirect('inquiry_status')
-
 
 
 
@@ -720,6 +718,7 @@ def backup_database(request):
             return JsonResponse({"message": "Failed to create a backup."}, status=500)
 
     return JsonResponse({"message": "Invalid request method."}, status=400)
+
 
 
 def restore_database(request):
