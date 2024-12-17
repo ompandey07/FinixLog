@@ -1,4 +1,8 @@
 from django.db import models
+from userauths.models import Employee
+from django.utils import timezone  
+
+
 
 # Create your models here.
 class Crm_Contacts (models.Model):
@@ -9,9 +13,12 @@ class Crm_Contacts (models.Model):
     website = models.CharField(max_length=50 , null=True)
     designaton = models.CharField(max_length=50 , null=True)
 
-class Crm_Notes (models.Model):
-    note_title = models.CharField(max_length=50)
-    note_content = models.CharField(max_length=50)
+class Crm_Notes(models.Model):
+    note_title = models.CharField(max_length=200)
+    note_content = models.TextField()
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)  # Associate with Employee
+    created_at = models.DateTimeField(default=timezone.now)
+
 
 
 

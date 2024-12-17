@@ -1,4 +1,5 @@
 /venv/
+/world/
 
 
 # Ignore SQLite database

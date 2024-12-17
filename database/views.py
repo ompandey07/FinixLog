@@ -3,8 +3,15 @@ from .models import Crm_Contacts , Crm_Notes , Event
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 import json
+from userauths.models import Employee
 from userauths.utils import create_log
-
+import shutil
+import os
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.shortcuts import render, get_object_or_404, redirect
 
 
 
@@ -62,19 +69,41 @@ def edit(request, contact_id):
     
 
 
+@login_required
 def create_notes(request):
+    # Handle note creation
     if request.method == "POST":
-      note_title = request.POST.get('note_title')
-      note_content = request.POST.get('note_content')
-      Crm_Notes.objects.create(
-          note_title = note_title,
-          note_content = note_content
-      )
-      create_log(f"Note Has Been Created", request.user)
-      return redirect ('create_notes')
+        note_title = request.POST.get('note_title')
+        note_content = request.POST.get('note_content')
+        # Associate the note with the logged-in user's employee record
+        employee = Employee.objects.filter(user=request.user).first()
+        if employee:
+            Crm_Notes.objects.create(
+                note_title=note_title,
+                note_content=note_content,
+                employee=employee  # Link the note to the employee
+            )
+            create_log("Note Has Been Created", request.user)
+        return redirect('create_notes')
 
-    notes = Crm_Notes.objects.all()
-    return render(request, "crm/Notes.html" , {'notes' : notes,})
+    # Check if the user is a superuser
+    if request.user.is_superuser:
+        notes = Crm_Notes.objects.all()  # Superuser sees all notes
+    else:
+        # Filter notes for the specific employee
+        employee = Employee.objects.filter(user=request.user).first()
+        if employee:
+            notes = Crm_Notes.objects.filter(employee=employee)
+        else:
+            notes = Crm_Notes.objects.none()  # No employee, no notes
+
+    context = {
+        'notes': notes,
+    }
+
+    return render(request, "crm/Notes.html", context)
+
+
 
 def delete_note (request , id):
     db=request.session.get('database_path')

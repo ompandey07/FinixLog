@@ -50,7 +50,6 @@
       max-width: 1400px;
       margin: 30px auto;
       background-color: #ffffff;
-      border-radius: 15px;
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
       padding: 30px;
     }
@@ -63,7 +62,6 @@
     .todo-item {
       transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
       border: 1px solid rgba(0, 0, 0, 0.171);
-      border-radius: 5px;
       overflow: hidden;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
@@ -91,7 +89,6 @@
       width: 100%;
       padding: 15px 20px;
       border: none;
-      border-radius: 30px;
       background-color: #f0f4f8;
       font-size: 16px;
       transition: box-shadow 0.3s ease-in-out;
@@ -131,7 +128,6 @@
       transform: scale(1.1);
     }
     .modal-content {
-      border-radius: 15px;
       overflow: hidden;
     }
     .modal-header {
@@ -147,7 +143,6 @@
       color: #2c3e50;
     }
     .form-control {
-      border-radius: 8px;
       border: 1px solid #bdc3c7;
       padding: 12px 15px;
       transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
@@ -160,7 +155,6 @@
       background-color: #3498db;
       color: #ffffff;
       border: none;
-      border-radius: 8px;
       padding: 12px 20px;
       font-weight: 600;
       transition: background-color 0.3s ease-in-out;
@@ -210,10 +204,8 @@
 <body>
   <header class="sticky-header">
     <div class="container">
-      <div class="d-flex justify-content-between align-items-center">
-        <a class="navbar-brand" href="{% if is_superuser %} '/admin_dashboard' {% else %} '/users_dashboard' {% endif %}">
-          <img src="/static/images/Logo.png" alt="" id="nav-logo">
-        </a>
+      <div class="d-flex justify-content-between align-items-center">        
+          <img src="/static/images/Logo.png" alt="" id="nav-logo">        
         <h2 class="m-0" style="color: #3498db"><i class="ri-contacts-book-2-fill"></i> EASY LOGS CONTACTS</h2>
       </div>
     </div>

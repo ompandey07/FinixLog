@@ -34,7 +34,8 @@
         }
         .calendar-container {
             display: flex;
-            height: calc(100vh - 64px);
+            height: calc(85vh - 64px);
+            margin-top: 55px
         }
         .main-calendar {
             flex-grow: 1;
@@ -73,7 +74,6 @@
             color: white;
             padding: 0.25rem 0.5rem;
             margin-top: 0.25rem;
-            border-radius: 4px;
             font-size: 0.75rem;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -83,7 +83,6 @@
         }
         .btn {
             padding: 0.5rem 1rem;
-            border-radius: 4px;
             transition: all 0.2s ease;
         }
         .btn-primary {
@@ -106,7 +105,6 @@
         }
         .modal-content {
             background-color: white;
-            border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
         }
@@ -114,7 +112,6 @@
             width: 100%;
             padding: 0.5rem;
             border: 1px solid #e2e8f0;
-            border-radius: 4px;
             transition: all 0.2s ease;
         }
         .input-field:focus {
@@ -128,13 +125,11 @@
 <body>
     <div class="app-container">
         <header class="app-header">
-            <a href="{% if is_superuser %} '/admin_dashboard' {% else %} '/users_dashboard' {% endif %}">
                 <img
                 src="/static/images/Logo.png"
                 alt="logo"
                 style="max-width: 50px; height: 40px;"
               />
-            </a>
             <span class="text-2xl font-bold px-3 ">EASY LOGS CALENDAR</span>
         </header>
         <div class="calendar-container">
@@ -165,7 +160,7 @@
 
     <!-- Event Modal -->
     <div id="eventModal" class="modal fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center">
-        <div class="modal-content bg-white p-6 rounded-lg w-96">
+        <div class="modal-content bg-white p-6  w-96">
             <div class="flex justify-between items-center mb-4">
                 <h2 id="modalTitle" class="text-xl font-bold">New Event</h2>
                 <button id="closeModal" class="text-gray-500"><i class="fas fa-times"></i></button>

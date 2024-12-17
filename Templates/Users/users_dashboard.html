@@ -122,41 +122,7 @@
                 </div>
               </div>
             </div>
-          </div>
-          {% comment %} <div class="relative z-[1000] flex items-center ">
-            <button
-              type="button"
-              class=" mainbtn flex items-center  rounded-full "
-            >
-              {% if employee.profile_image %}
-              <img
-                src="{{ employee.profile_image.url }}"
-                alt="{{ employee.first_name }} {{ employee.last_name }}"
-                class="h-10 w-10 rounded-full object-cover"
-              />
-              {% else %}
-              <img
-                src="/static/images/default_user.png"
-                alt="Default Profile"
-                class="h-10 w-10 rounded-full object-cover"
-              />
-              {% endif %}
-              <span class="ml-3 text-sm font-medium text-gray-700"
-                >{{ employee.first_name }} {{ employee.last_name }}</span
-              >
-              <div> <svg
-                class="ml-2 h-5 w-5 text-gray-600"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-              ></div>
-            </button>
-            <div
-              class="absolute flex gap-3 hiddenbtn w-full h-[70px] border flex-col py-2  shadow-2xl top-[100%] bg-white px-4 text-sm rounded-md left-0"
-            >
-              <a href="/yourprofile" class="cursor-pointer hover:bg-gray-100">Your Profile</a>
-              <a href="/logout" class="cursor-pointer hover:bg-gray-100">Log Out</a>
-            </div>
-          </div> {% endcomment %}
+          </div>          
         </div>
       </div>
     </nav>
