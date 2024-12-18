@@ -15,39 +15,18 @@ import os
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-# # Static files settings
-# STATIC_URL = '/static/'
-# STATICFILES_DIRS = [BASE_DIR / 'static']
-# STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-# # Media files settings
-# MEDIA_URL = '/media/'
-# MEDIA_ROOT = BASE_DIR / 'media'
 
 
-# Static files (CSS, JavaScript, Images)
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Directory to collect static files
-STATIC_URL = '/static/'
-
-
-
-# Additional locations of static files
+# Static files settings
+STATIC_URL = '/static/'  # URL to access static files in the browser
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',
+    BASE_DIR / 'static',  # Path to your static directory containing static files
 ]
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # Directory where static files will be collected using `collectstatic`
 
-
-
-# Media files (User-uploaded files)
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles') 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-# BASE_DIR = Path(__file__).resolve().parent.parent
-# MEDIA_URL = '/media/'
-# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
+# Media files settings
+MEDIA_URL = '/media/'  # URL to access media files in the browser
+MEDIA_ROOT = BASE_DIR / 'mediafiles'  # Directory to store user-uploaded media files
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-_2vcrf_j53p%%b3(j5j$)zyz)#8j%$rmo@5#1nj0^d_u-)k@51'
