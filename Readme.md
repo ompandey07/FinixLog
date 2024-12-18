@@ -79,11 +79,6 @@ Hey, hello everyone! I am **Om Pandey**, but you can call me Pandey. I am a soft
    http://127.0.0.1:8000
    ```
 
-## Screenshots
-
-![EasyLogs Dashboard](link-to-dashboard-screenshot)
-
-![Employee Management](link-to-employee-management-screenshot)
 
 ## Contributing
 
