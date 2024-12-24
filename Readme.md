@@ -1,6 +1,6 @@
 # EasyLogs
 
-Hey, hello everyone! I am **Om Pandey**, but you can call me Pandey. I am a software engineer from Nepal, and I love creating applications that make life easier and more efficient. Welcome to **EasyLogs**, a web application designed to simplify business management with powerful features and user-friendly design.
+Hey, hello everyone! I am **Om Pandey**, but you can call me Pandey. I am a software Developer from Nepal, and I love creating applications that make life easier and more efficient. Welcome to **EasyLogs**, a web application designed to simplify business management with powerful features and user-friendly design.
 
 ## Features
 
