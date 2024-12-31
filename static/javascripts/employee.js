@@ -12,16 +12,4 @@ feather.replace();
             }
         });
 
-        function togglePasswordVisibility(inputId, toggleId) {
-            const input = document.getElementById(inputId);
-            const toggle = document.getElementById(toggleId);
-            toggle.addEventListener('click', function() {
-                const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
-                input.setAttribute('type', type);
-                this.querySelector('i').setAttribute('data-feather', type === 'password' ? 'eye' : 'eye-off');
-                feather.replace();
-            });
-        }
-
-        togglePasswordVisibility('password', 'togglePassword');
-        togglePasswordVisibility('confirmPassword', 'toggleConfirmPassword');
+        

@@ -95,7 +95,7 @@
                 </button>
               </div>
               <div
-                class="hidden origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+                class="hidden origin-top-right absolute right-0 mt-4 w-48  shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
                 role="menu"
                 aria-orientation="vertical"
                 aria-labelledby="user-menu-button"
@@ -109,7 +109,7 @@
                     role="menuitem"
                     tabindex="-1"
                     id="user-menu-item-0"
-                    >Your Profile</a
+                    ><i class="ri-user-line mr-2 text-gray-500"></i> Your Profile</a
                   >
                   <a
                     href="{% url 'logout' %}"
@@ -117,25 +117,24 @@
                     role="menuitem"
                     tabindex="-1"
                     id="user-menu-item-2"
-                    >Logout</a
+                    ><i class="ri-logout-box-r-line mr-2 text-gray-500"></i> Logout</a
                   >
                 </div>
               </div>
             </div>
-          </div>          
+          </div>
         </div>
       </div>
     </nav>
 
     <div class="flex flex-1 bg-gray-100">
       <!-- Sidebar -->
-      <div
-        class="hidden md:flex md:flex-shrink-0"
-        style="border-right: 1px solid rgba(0, 0, 0, 0.212)"
-      >
+      <div class="hidden md:flex md:flex-shrink-0" style="border-right: 1px solid rgba(0, 0, 0, 0.212)">
         <div class="flex flex-col w-64">
           <div class="flex flex-col h-0 flex-1 bg-white shadow-lg">
             <nav class="flex-1 px-2 py-4 space-y-1">
+            
+
               <div x-data="{ open: false }">
                 <button
                   @click="open = !open"
@@ -150,18 +149,14 @@
                     href="/add_inquiry"
                     class="flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900"
                   >
-                    <i
-                      class="ri-add-circle-line mr-3 text-xl text-green-500"
-                    ></i>
+                  <i class="ri-arrow-right-line px-4"></i>
                     Add Inquiries
                   </a>
                   <a
                     href="/inquiry_status"
                     class="flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900"
                   >
-                    <i
-                      class="ri-file-list-3-line mr-3 text-xl text-orange-500"
-                    ></i>
+                  <i class="ri-arrow-right-line px-4"></i>
                     Inquiries Status
                   </a>
                 </div>
@@ -181,31 +176,29 @@
                     href="/add_cheque"
                     class="flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900"
                   >
-                    <i
-                      class="ri-bank-card-line mr-3 text-xl text-green-500"
-                    ></i>
+                  <i class="ri-arrow-right-line px-4"></i>
                     Add Cheques
                   </a>
                   <a
                     href="/due_cheque_reports"
                     class="flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900"
                   >
-                    <i class="ri-timer-line mr-3 text-xl text-yellow-500"></i>
-                    Due Pending Cheques
+                  <i class="ri-arrow-right-line px-4"></i>
+                    Pending Cheques
                   </a>
                   <a
                     href="/pending_cheque_reports"
                     class="flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900"
                   >
-                    <i class="ri-timer-line mr-3 text-xl text-yellow-500"></i>
-                    Pending Cheques
+                  <i class="ri-arrow-right-line px-4"></i>
+                  In Bank
                   </a>
                   <a
                     href="/completed_cheque_reports"
                     class="flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900"
                   >
-                    <i class="ri-file-chart-line mr-3 text-xl text-red-500"></i>
-                    Completed Cheques Reports
+                    <i class="ri-arrow-right-line px-4"></i>
+                    Cheque Summary
                   </a>
                 </div>
               </div>
@@ -234,7 +227,7 @@
                   class="ri-contacts-book-line mr-3 text-xl text-green-500"
                 ></i>
                 Contacts
-              </a>
+              </a>                         
             </nav>
           </div>
         </div>
@@ -246,53 +239,187 @@
           class="flex-1 relative z-0 overflow-y-auto py-6 focus:outline-none"
         >
           <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-            <h1 class="text-2xl font-semibold text-gray-900 mb-6">
-              <i class="ri-dashboard-line"></i> Dashboard
+            <h1 class="text-2xl font-semibold mb-6">
+              <span class="text-slate-800">Dashboard Overview</span>
             </h1>
           </div>
           <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-            <!-- Dashboard content -->
+            <!-- Dashboard Grid -->
             <div class="grid grid-cols-2 gap-6">
-              <!-- Inquiries -->
-              <div
-                class="dashboard-card bg-white rounded-lg shadow-lg p-6 flex flex-col items-center justify-center transform transition-all duration-300 hover:shadow-xl"
-              >
-                <i
-                  class="ri-question-answer-line text-5xl text-blue-500 mb-4"
-                ></i>
-                <h2 class="text-2xl font-semibold text-gray-800">Inquiries</h2>
-                <p class="text-gray-600 mt-2">{{inquiries_count}}</p>
+              <!-- Inquiries Card -->
+              <div class="group relative">
+                <div
+                  class="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-transparent"
+                ></div>
+                <div
+                  class="relative bg-white border-l-4 border-blue-500 shadow-lg h-60 p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-xl"
+                >
+                  <div>
+                    <div class="flex items-center justify-between mb-4">
+                      <div class="flex items-center space-x-3">
+                        <div class="p-2 bg-blue-500 text-white">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-6 w-6"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                            />
+                          </svg>
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-800">
+                          Inquiries
+                        </h2>
+                      </div>
+                      <div class="h-1 w-16 bg-blue-500"></div>
+                    </div>
+                    <p class="text-slate-500">Total active inquiries</p>
+                  </div>
+                  <div class="flex items-end justify-between">
+                    <div class="text-4xl font-bold text-slate-800">
+                      {{inquiries_count}}
+                    </div>
+                    <div class="text-blue-500 font-medium">Active</div>
+                  </div>
+                </div>
               </div>
 
-              <!-- Cheques -->
-              <div
-                class="dashboard-card bg-white rounded-lg shadow-lg p-6 flex flex-col items-center justify-center transform transition-all duration-300 hover:shadow-xl"
-              >
-                <i class="ri-bank-card-line text-5xl text-green-500 mb-4"></i>
-                <h2 class="text-2xl font-semibold text-gray-800">
-                  Pending Cheques
-                </h2>
-                <p class="text-gray-600 mt-2">{{pending_cheques_count}}</p>
+              <!-- Cheques Card -->
+              <div class="group relative">
+                <div
+                  class="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-transparent"
+                ></div>
+                <div
+                  class="relative bg-white border-l-4 border-emerald-500 shadow-lg h-60 p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-xl"
+                >
+                  <div>
+                    <div class="flex items-center justify-between mb-4">
+                      <div class="flex items-center space-x-3">
+                        <div class="p-2 bg-emerald-500 text-white">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-6 w-6"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                            />
+                          </svg>
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-800">
+                          Pending Cheques
+                        </h2>
+                      </div>
+                      <div class="h-1 w-16 bg-emerald-500"></div>
+                    </div>
+                    <p class="text-slate-500">Awaiting processing</p>
+                  </div>
+                  <div class="flex items-end justify-between">
+                    <div class="text-4xl font-bold text-slate-800">
+                      {{pending_cheques_count}}
+                    </div>
+                    <div class="text-emerald-500 font-medium">Pending</div>
+                  </div>
+                </div>
               </div>
 
-              <!-- Contacts -->
-              <div
-                class="dashboard-card bg-white rounded-lg shadow-lg p-6 flex flex-col items-center justify-center transform transition-all duration-300 hover:shadow-xl"
-              >
-                <i
-                  class="ri-contacts-book-2-line text-5xl text-purple-500 mb-4"
-                ></i>
-                <h2 class="text-2xl font-semibold text-gray-800">Contacts</h2>
-                <p class="text-gray-600 mt-2">{{contacts_count}}</p>
+              <!-- Contacts Card -->
+              <div class="group relative">
+                <div
+                  class="absolute inset-0 bg-gradient-to-br from-violet-500/20 to-transparent"
+                ></div>
+                <div
+                  class="relative bg-white border-l-4 border-violet-500 shadow-lg h-60 p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-xl"
+                >
+                  <div>
+                    <div class="flex items-center justify-between mb-4">
+                      <div class="flex items-center space-x-3">
+                        <div class="p-2 bg-violet-500 text-white">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-6 w-6"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                            />
+                          </svg>
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-800">
+                          Contacts
+                        </h2>
+                      </div>
+                      <div class="h-1 w-16 bg-violet-500"></div>
+                    </div>
+                    <p class="text-slate-500">Total contacts database</p>
+                  </div>
+                  <div class="flex items-end justify-between">
+                    <div class="text-4xl font-bold text-slate-800">
+                      {{contacts_count}}
+                    </div>
+                    <div class="text-violet-500 font-medium">Total</div>
+                  </div>
+                </div>
               </div>
 
-              <!-- Employees -->
-              <div
-                class="dashboard-card bg-white rounded-lg shadow-lg p-6 flex flex-col items-center justify-center transform transition-all duration-300 hover:shadow-xl"
-              >
-                <i class="ri-team-line text-5xl text-orange-500 mb-4"></i>
-                <h2 class="text-2xl font-semibold text-gray-800">Employees</h2>
-                <p class="text-gray-600 mt-2">{{employees_count}}</p>
+              <!-- Employees Card -->
+              <div class="group relative">
+                <div
+                  class="absolute inset-0 bg-gradient-to-br from-amber-500/20 to-transparent"
+                ></div>
+                <div
+                  class="relative bg-white border-l-4 border-amber-500 shadow-lg h-60 p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-xl"
+                >
+                  <div>
+                    <div class="flex items-center justify-between mb-4">
+                      <div class="flex items-center space-x-3">
+                        <div class="p-2 bg-amber-500 text-white">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-6 w-6"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                            />
+                          </svg>
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-800">
+                          Employees
+                        </h2>
+                      </div>
+                      <div class="h-1 w-16 bg-amber-500"></div>
+                    </div>
+                    <p class="text-slate-500">Active team members</p>
+                  </div>
+                  <div class="flex items-end justify-between">
+                    <div class="text-4xl font-bold text-slate-800">
+                      {{employees_count}}
+                    </div>
+                    <div class="text-amber-500 font-medium">Team</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -308,6 +435,8 @@
       <div class="flex-shrink-0 flex items-center">
         <img class="h-6 w-auto" src="/static/images/Logo.png" alt="Easy Logs" />
         <b class="px-2">Easy Logs</b>
+        <span class="text-gray-500 font-normal text-xs ml-36">Version 1.0</span>
+
       </div>
       <div class="flex items-center space-x-4">
         <div id="current-time" class="text-gray-600"></div>

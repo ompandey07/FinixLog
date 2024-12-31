@@ -132,10 +132,12 @@
               type="button"
               id="togglePassword"
               class="absolute right-2 top-1/2 transform -translate-y-1/2"
+              onclick="togglePasswordVisibility()"
             >
-              <i data-feather="eye" class="text-gray-500"></i>
+              <i data-feather="eye" class="text-gray-500" id="eyeIcon"></i>
             </button>
           </div>
+          
           <div class="flex items-center relative">
             <i data-feather="lock" class="mr-2 text-gray-500"></i>
             <input
@@ -150,11 +152,47 @@
               type="button"
               id="toggleConfirmPassword"
               class="absolute right-2 top-1/2 transform -translate-y-1/2"
+              onclick="toggleConfirmPasswordVisibility()"
             >
-              <i data-feather="eye" class="text-gray-500"></i>
+              <i data-feather="eye" class="text-gray-500" id="confirmEyeIcon"></i>
             </button>
           </div>
+          
         </div>
+        <script>
+          // Toggle visibility for password field
+          function togglePasswordVisibility() {
+            const passwordField = document.getElementById("password");
+            const eyeIcon = document.getElementById("eyeIcon");
+        
+            if (passwordField.type === "password") {
+              passwordField.type = "text";
+              eyeIcon.setAttribute("data-feather", "eye-off"); // Change icon to 'eye-off'
+            } else {
+              passwordField.type = "password";
+              eyeIcon.setAttribute("data-feather", "eye"); // Change icon to 'eye'
+            }
+        
+            feather.replace(); // Re-render the feather icons
+          }
+        
+          // Toggle visibility for confirm password field
+          function toggleConfirmPasswordVisibility() {
+            const confirmPasswordField = document.getElementById("confirmPassword");
+            const confirmEyeIcon = document.getElementById("confirmEyeIcon");
+        
+            if (confirmPasswordField.type === "password") {
+              confirmPasswordField.type = "text";
+              confirmEyeIcon.setAttribute("data-feather", "eye-off"); // Change icon to 'eye-off'
+            } else {
+              confirmPasswordField.type = "password";
+              confirmEyeIcon.setAttribute("data-feather", "eye"); // Change icon to 'eye'
+            }
+        
+            feather.replace(); // Re-render the feather icons
+          }
+        </script>
+        
 
         <div class="mt-8 flex justify-center">
           <button type="submit" class="bg-blue-500 text-white px-6 py-2">
@@ -164,7 +202,6 @@
       </form>
     </div>
 
-    <script src="/static/javascripts/employee.js"></script>
     <script src="/static/javascripts/employee.js"></script>
   </body>
 </html>
