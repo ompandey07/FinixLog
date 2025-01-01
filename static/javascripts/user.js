@@ -13,14 +13,6 @@
      }
  });
 
- // Smooth animation for sidebar submenus
- const sidebarButtons = document.querySelectorAll('.sidebar-button');
- sidebarButtons.forEach(button => {
-     button.addEventListener('click', () => {
-         const submenu = button.nextElementSibling;
-         submenu.classList.toggle('open');
-     });
- });
 
 // Update footer information
 function updateFooterInfo() {
