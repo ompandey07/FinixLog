@@ -15,6 +15,12 @@ from django.core.files.storage import FileSystemStorage
 from .utils import create_log
 from django.contrib.auth.models import User
 
+
+
+#! ----------------------------------------------------------------------- Views Start Here -----------------------------------------------------------------------
+
+
+
 CustomUser = get_user_model()
 
 # Custom decorator to prevent admin access to certain views
@@ -29,7 +35,9 @@ def prevent_admin_access(view_func):
         return view_func(request, *args, **kwargs)
     return _wrapped_view
 
-# ----------------------------------------
+
+
+#? -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Function to create default admin user with predefined credentials
 def create_default_user():
@@ -41,7 +49,9 @@ def create_default_user():
     if not User.objects.filter(username=username).exists():
         User.objects.create_superuser(username=username, email=username, password=password)
 
-# ----------------------------------------
+
+
+#? -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # View for handling user login
 def login_page(request):
@@ -67,20 +77,26 @@ def login_page(request):
             return render(request, "index.html", {'error': 'Username or Password did not match'})
     return render(request, "index.html")
 
-# ----------------------------------------
+
+
+#? -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # View for handling user logout
 def logout_view(request):
     logout(request)
     return redirect('login_page')
 
-# ----------------------------------------
+
+
+#? -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Utility function to check if user is superuser
 def is_superuser(user):
     return user.is_superuser
 
-# ----------------------------------------
+
+
+#? -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # View for admin dashboard, accessible only to superusers
 @login_required
@@ -100,7 +116,9 @@ def admin_dashboard(request):
         
     return render(request, 'Admin/admin_dashboard.html',context)
 
-# ----------------------------------------
+
+
+#? -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # View for user dashboard, restricted from admin access
 @login_required
@@ -130,7 +148,9 @@ def users_dashboard(request):
     }    
     return render(request, "Users/users_dashboard.html", context)
 
-# ----------------------------------------
+
+
+#? -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # View for adding new employees, accessible only to superusers
 @login_required
@@ -169,7 +189,9 @@ def add_employee(request):
         return redirect('admin_dashboard')
     return render(request, 'Admin/add_employee.html')
 
-# ----------------------------------------
+
+
+#? -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # View for adding new cheques
 @login_required
@@ -213,7 +235,9 @@ def add_cheque(request):
 
     return render(request, 'cheque/add_cheque.html',context)
 
-# ----------------------------------------
+
+
+#? -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # View for adding new inquiries
 @login_required
@@ -276,7 +300,9 @@ def add_inquiry(request):
 
     return render(request, 'inquiry/add_inquiry.html', context)
 
-# ----------------------------------------
+
+
+#? -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # View for updating existing inquiries
 @login_required
@@ -305,7 +331,9 @@ def update_inquiry(request, inquiry_id):
     }
     return render(request, 'inquiry/update_inquiry.html',context)
 
-# ----------------------------------------
+
+
+#? -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # View for displaying inquiry status
 @login_required
@@ -336,7 +364,9 @@ def inquiry_status(req):
 
     return render(req, "inquiry/inquiry_status.html", context)
 
-# ----------------------------------------
+
+
+#? -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # View for updating inquiry status
 @login_required
@@ -352,7 +382,9 @@ def update_inquiry_status(req, inquiry_id):
         return redirect('inquiry_status')
     return redirect('inquiry_status')
 
-# ----------------------------------------
+
+
+#? -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # View for deleting inquiries (admin only)
 @login_required
@@ -363,7 +395,9 @@ def delete_inquiry(request, inquiry_id):
     create_log(f"deleted inquiry of customer '{inquiry.customer_name}' and company '{inquiry.company_name}'   ", request.user)
     return redirect('inquiry_status')
 
-# ----------------------------------------
+
+
+#? -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # View for managing employees (admin only)
 @login_required
@@ -375,7 +409,9 @@ def manage_employee(req):
     }
     return render (req , "Admin/manage_employee.html",context)
 
-# ----------------------------------------
+
+
+#? -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # View for updating employee information (admin only)
 @login_required
@@ -425,7 +461,9 @@ def update_employee(request, employee_id):
 
     return render(request, 'Admin/update_employee.html', context)
 
-# ----------------------------------------
+
+
+#? -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # View for deleting employees (admin only)
 @login_required
@@ -437,7 +475,9 @@ def delete_employee(request, employee_id):
     create_log(f"employee of name '{employee.first_name}{employee.last_name}' is deleted", request.user)
     return redirect('manage_employee')
 
-# ----------------------------------------
+
+
+#? -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # View for displaying cheque reports
 @login_required
@@ -462,7 +502,9 @@ def cheque_reports(request):
     
     return render(request, "cheque/cheque_reports.html", context)
 
-# ----------------------------------------
+
+
+#? -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # View for displaying pending cheque reports
 @login_required
@@ -489,7 +531,9 @@ def pending_cheque_reports(request):
 
     return render(request, "cheque/pending_cheque_reports.html", context)
 
-# ----------------------------------------
+
+
+#? -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # View for displaying completed cheque reports
 @login_required
@@ -515,7 +559,9 @@ def completed_cheque_reports(request):
 
     return render(request, "cheque/completed_cheque_reports.html", context)
 
-# ----------------------------------------
+
+
+#? -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # View for depositing cheques
 @login_required
@@ -527,7 +573,9 @@ def deposit_cheque(request, cheque_id):
 
     return JsonResponse({'status': 'success'}) 
 
-# ----------------------------------------
+
+
+#? -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # View for updating cheque status
 @login_required
@@ -546,7 +594,9 @@ def cheque_update_status(request, cheque_id):
         cheque.save()
         return redirect('pending_cheque_reports')  
 
-# ----------------------------------------
+
+
+#? -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # View for user profile management
 @login_required
@@ -594,7 +644,9 @@ def user_profile(request):
 
     return render(request, "profile/user_profile.html", context)
 
-# ----------------------------------------
+
+
+#? -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # View for database backup
 def backup_database(request):
@@ -619,7 +671,9 @@ def backup_database(request):
 
     return JsonResponse({"message": "Invalid request method."}, status=400)
 
-# ----------------------------------------
+
+
+#? -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # View for database restoration
 def restore_database(request):
@@ -640,7 +694,9 @@ def restore_database(request):
 
     return JsonResponse({"message": "No file uploaded or invalid request."}, status=400)
 
-# ----------------------------------------
+
+
+#? -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # View for activity logs
 def activity_log(request):
@@ -650,7 +706,9 @@ def activity_log(request):
     logs = ActivityLog.objects.all().order_by('-timestamp')
     return render(request, 'Admin/activity_log.html', {'logs': logs})
 
-# ----------------------------------------
+
+
+#? -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 
@@ -659,7 +717,9 @@ def activity_log(request):
 def error_acces_denied(request):
     return render(request, '404.html')
 
-# ----------------------------------------
+
+
+#? -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # View for post arena log
 @login_required

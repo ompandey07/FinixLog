@@ -15,6 +15,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 
 
 
+#! --------------------------------------------------------------------------------Views Start Here--------------------------------------------------------------------------------
+
+# Create Contact
 def create_contact(request):
     if request.method == "POST":
         # Get form data from POST request
@@ -41,6 +44,9 @@ def create_contact(request):
     return render(request, "crm/Contacts.html", {'contacts': contacts})
 
 
+
+#? ----------------------------------------------------------------------------------------------------------------------------
+# Delete Contact
 def delete (request , id):
     db=request.session.get('database_path')
     contact = Crm_Contacts.objects.get(id=id)
@@ -49,7 +55,8 @@ def delete (request , id):
 
 
 
-
+#? ----------------------------------------------------------------------------------------------------------------------------
+# Edit Contact
 def edit(request, contact_id):
     db=request.session.get('database_path')
     contact = get_object_or_404(Crm_Contacts, id=contact_id)
@@ -66,9 +73,11 @@ def edit(request, contact_id):
         return JsonResponse({'status': 'success'})
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
-    
 
 
+
+#? ----------------------------------------------------------------------------------------------------------------------------
+# Create Notes
 @login_required
 def create_notes(request):
     # Handle note creation
@@ -105,15 +114,16 @@ def create_notes(request):
 
 
 
+#? ----------------------------------------------------------------------------------------------------------------------------
+# Delete Note
 def delete_note (request , id):
     db=request.session.get('database_path')
     note = Crm_Notes.objects.get(id=id)
     note.delete()
     return redirect ('create_notes')
 
-
-
-
+# -------------
+# Calendar Setup
 def calendar_setup(request):
     events = Event.objects.all()
     event_data = [{
@@ -125,6 +135,10 @@ def calendar_setup(request):
     } for event in events]
     return render(request, 'crm/Calender.html', {'events_json': json.dumps(event_data)})
 
+
+
+#? ----------------------------------------------------------------------------------------------------------------------------
+# Add Event (POST)
 @require_POST
 def add_event(request):
     data = json.loads(request.body)
@@ -136,6 +150,10 @@ def add_event(request):
     )
     return JsonResponse({'status': 'success', 'id': event.id})
 
+
+
+#? ----------------------------------------------------------------------------------------------------------------------------
+# Update Event (POST)
 @require_POST
 def update_event(request, event_id):
     data = json.loads(request.body)
@@ -147,6 +165,10 @@ def update_event(request, event_id):
     event.save()
     return JsonResponse({'status': 'success'})
 
+
+
+#? ----------------------------------------------------------------------------------------------------------------------------
+# Delete Event (POST)
 @require_POST
 def delete_event(request, event_id):
     Event.objects.filter(id=event_id).delete()
@@ -154,11 +176,8 @@ def delete_event(request, event_id):
 
 
 
-
-
-
-
-
+#? ----------------------------------------------------------------------------------------------------------------------------
+# Blog View (for Users)
 @login_required
 def blog_view (request):
     return render(request , 'Users/Blogs.html')
