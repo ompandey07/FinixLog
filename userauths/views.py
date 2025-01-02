@@ -1,3 +1,4 @@
+# Authentication and model imports
 from django.contrib.auth import authenticate, login , logout
 from .models import Employee,Inquiry,Cheque,ActivityLog
 from database.models import Crm_Contacts
@@ -14,10 +15,9 @@ from django.core.files.storage import FileSystemStorage
 from .utils import create_log
 from django.contrib.auth.models import User
 
-
-
 CustomUser = get_user_model()
 
+# Custom decorator to prevent admin access to certain views
 def prevent_admin_access(view_func):
     def _wrapped_view(request, *args, **kwargs):
         if request.user.is_superuser:
@@ -29,8 +29,9 @@ def prevent_admin_access(view_func):
         return view_func(request, *args, **kwargs)
     return _wrapped_view
 
+# ----------------------------------------
 
-
+# Function to create default admin user with predefined credentials
 def create_default_user():
     """Creates a default user with specific credentials if not exists."""
     username = "admin@admin.com"
@@ -40,8 +41,9 @@ def create_default_user():
     if not User.objects.filter(username=username).exists():
         User.objects.create_superuser(username=username, email=username, password=password)
 
+# ----------------------------------------
 
-
+# View for handling user login
 def login_page(request):
     # Ensure the default user exists before processing login
     create_default_user()
@@ -65,30 +67,30 @@ def login_page(request):
             return render(request, "index.html", {'error': 'Username or Password did not match'})
     return render(request, "index.html")
 
+# ----------------------------------------
 
+# View for handling user logout
 def logout_view(request):
     logout(request)
     return redirect('login_page')
 
+# ----------------------------------------
 
-
-
+# Utility function to check if user is superuser
 def is_superuser(user):
     return user.is_superuser
 
+# ----------------------------------------
 
-
-
+# View for admin dashboard, accessible only to superusers
 @login_required
 @user_passes_test(is_superuser)
 def admin_dashboard(request):
     inquiries_count = Inquiry.objects.count()
-    pending_cheques_count = Cheque.objects.filter(pending_status=True, diposited=False).count()  # Adjust the filter as necessary
+    pending_cheques_count = Cheque.objects.filter(pending_status=True, diposited=False).count()
     employees_count = Employee.objects.count()
     contacts_count = Crm_Contacts.objects.count()
     
-
-    # Prepare the context
     context = {
         'inquiries_count': inquiries_count,
         'pending_cheques_count': pending_cheques_count,
@@ -98,18 +100,14 @@ def admin_dashboard(request):
         
     return render(request, 'Admin/admin_dashboard.html',context)
 
+# ----------------------------------------
 
-
-
-
+# View for user dashboard, restricted from admin access
 @login_required
 @prevent_admin_access
 def users_dashboard(request):
     user = request.user
     employee = Employee.objects.filter(user=user).first() 
-  
-    # inquiries_count = Inquiry.objects.filter(called_received_by=request.user).count
-    # pending_cheques_count = Cheque.objects.filter(pending_status=True).count()  # Adjust the filter as necessary
     employees_count = Employee.objects.count()
     contacts_count = Crm_Contacts.objects.count()
 
@@ -123,24 +121,18 @@ def users_dashboard(request):
                 called_received_by=full_name
             ).count()
 
-    # Prepare the context
     context = {
         'inquiries_count': inquiries_count,
         'pending_cheques_count': pending_cheques_count,
         'employees_count': employees_count,
         'employee': employee,
         'contacts_count': contacts_count,
-
-
     }    
     return render(request, "Users/users_dashboard.html", context)
 
+# ----------------------------------------
 
-CustomUser = get_user_model()
-
-def is_admin(user):
-    return user.is_superuser
-
+# View for adding new employees, accessible only to superusers
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def add_employee(request):
@@ -156,16 +148,13 @@ def add_employee(request):
         confirm_password = request.POST.get('confirm_password')
         profile_image = request.FILES.get('profile_image')
 
-        # Validate data
         if password != confirm_password:
             return render(request, 'Admin/add_employee.html', {'error': 'Passwords do not match'})
 
-        # Create User
         user = CustomUser.objects.create_user(username=username, email=email, password=password)
         user.is_employee = True
         user.save()
 
-        # Create Employee
         employee = Employee.objects.create(
             user=user,
             first_name=first_name,
@@ -180,16 +169,13 @@ def add_employee(request):
         return redirect('admin_dashboard')
     return render(request, 'Admin/add_employee.html')
 
-    
+# ----------------------------------------
 
-
-
+# View for adding new cheques
 @login_required
-# @user_passes_test(lambda u: u.is_superuser)
 def add_cheque(request):
     all_employees = Employee.objects.all()
     if request.method == 'POST':
-        # Get data from the form submission
         handled_by = request.POST.get('handled_by')
         company_name = request.POST.get('companyName')
         bank_name = request.POST.get('bankName')
@@ -201,8 +187,6 @@ def add_cheque(request):
         reminder_email = request.POST.get('reminderEmail')
         extra_reminder_email = request.POST.get('extraReminderEmail')
         
-
-        # Create a new Cheque instance
         cheque = Cheque(
             handled_by=handled_by,
             company_name=company_name,
@@ -216,36 +200,27 @@ def add_cheque(request):
             extra_reminder_email=extra_reminder_email
         )
         
-        # Save the cheque instance to the database
         cheque.save()
         create_log(f"Added Cheque of '{company_name}' with cheque no: '{cheque_number}' ", request.user)
+        return redirect('due_cheque_reports')
 
-        # Redirect to a success page or return to form with a success message
-        return redirect('due_cheque_reports')  # Replace with your actual success URL
-    context = {
-        
-    }
-     # Check if the user is a superuser or an employee
+    context = {}
     if request.user.is_superuser:
         context['all_employees'] = all_employees
     else:
-        # If the user is not an admin, filter to only their employee
         employee = Employee.objects.filter(user=request.user).first()
-        context['all_employees'] = [employee] if employee else []  # Ensure there's a list
+        context['all_employees'] = [employee] if employee else []
 
-    # Render the form in GET request
     return render(request, 'cheque/add_cheque.html',context)
 
-    
-    
-    
-    
+# ----------------------------------------
+
+# View for adding new inquiries
 @login_required
 def add_inquiry(request):
     all_employees = Employee.objects.all()
 
     if request.method == 'POST':
-        # Get data from the form submission
         date = request.POST.get('date')
         miti = request.POST.get('miti')
         customer_name = request.POST.get('customer_name')
@@ -255,28 +230,21 @@ def add_inquiry(request):
         called_received_by = request.POST.get('called_received_by')
         remarks = request.POST.get('remarks')
 
-        # Validate data (add your validation logic here as needed)
         if not customer_name or not contact_number:
             return render(request, 'add_inquiry.html', {'error': 'Please fill in all required fields'})
 
-        # If the select is disabled (only one employee), set called_received_by to that employee's name
         if len(all_employees) == 1 and not called_received_by:
             called_received_by = f"{all_employees.first().first_name} {all_employees.first().last_name}"
 
-
-        # Get the employee associated with the logged-in user
         employee = Employee.objects.filter(user=request.user).first()
 
-        # If no called_received_by is provided, set it to the employee's first name
         if not called_received_by:
             if employee:
-                called_received_by = f"{employee.first_name} {employee.last_name}"  # Concatenate first and last name
+                called_received_by = f"{employee.first_name} {employee.last_name}"
             elif len(all_employees) == 1:
                 called_received_by = f"{all_employees.first().first_name} {all_employees.first().last_name}"
 
-        # Save the inquiry to the database
         inquiry = Inquiry(
-            # form_no=form_no,
             date=date,
             miti=miti,
             customer_name=customer_name,
@@ -289,133 +257,115 @@ def add_inquiry(request):
         inquiry.save()
         create_log(f"Added Inquiry from  '{customer_name}'", request.user)
 
+        return redirect('inquiry_status')
 
-        # Redirect to a success page or return to form with success message
-        return redirect('inquiry_status')  # Make sure to replace 'success_page' with your actual redirect URL
-
-    # Calculate the next available form number (inquiry id)
     try:
         next_form_no = Inquiry.objects.latest('id').id + 1
     except Inquiry.DoesNotExist:
-        next_form_no = 1  # If no inquiries exist, the form_no starts from 1
+        next_form_no = 1
 
     context = {
         'next_form_no': next_form_no,
     }
 
-    # Check if the user is a superuser or an employee
     if request.user.is_superuser:
         context['all_employees'] = all_employees
     else:
-        # If the user is not an admin, filter to only their employee
         employee = Employee.objects.filter(user=request.user).first()
-        context['all_employees'] = [employee] if employee else []  # Ensure there's a list
+        context['all_employees'] = [employee] if employee else []
 
-    # Render the form in GET request
     return render(request, 'inquiry/add_inquiry.html', context)
 
+# ----------------------------------------
 
+# View for updating existing inquiries
 @login_required
-# @user_passes_test(lambda u: u.is_superuser)
-def update_inquiry(request,inquiry_id):
+def update_inquiry(request, inquiry_id):
     inquiry = get_object_or_404(Inquiry, id=inquiry_id)
     all_employees = Employee.objects.all()
-    
 
     if request.method == 'POST':
-        # Get data from the form submission
         inquiry.form_no = inquiry_id
         inquiry.date = request.POST.get('date')
         inquiry.customer_name = request.POST.get('customer_name')
         inquiry.company_name = request.POST.get('company_name')
         inquiry.contact_number = request.POST.get('contact_number')
         inquiry.address = request.POST.get('address')
-        inquiry.called_received_by = request.POST.get("called_received_by", inquiry.called_received_by)  # Keep existing value if not provided
+        inquiry.called_received_by = request.POST.get("called_received_by", inquiry.called_received_by)
         inquiry.remarks = request.POST.get('remarks')
-
-        # Validate data (add your validation logic here as needed)
         
         inquiry.save()
         create_log(f"Updated Inquiry of customer '{inquiry.customer_name}' from company '{inquiry.company_name}' ", request.user)
 
-        # Redirect to a success page or return to form with success message
-        return redirect('inquiry_status')  # Make sure to replace 'success_page' with your actual redirect URL
+        return redirect('inquiry_status')
     context = {
         'inquiry': inquiry,
         'all_employees': all_employees,
-        'is_superuser': request.user.is_superuser,  # Add this line
-
+        'is_superuser': request.user.is_superuser,
     }
-    # Render the form in GET request
     return render(request, 'inquiry/update_inquiry.html',context)
 
+# ----------------------------------------
 
-
+# View for displaying inquiry status
 @login_required
 def inquiry_status(req):
-    # Get all employees
     all_employees = Employee.objects.all()
 
-    # Check if the user is a superuser
     if req.user.is_superuser:
-        all_inquiry = Inquiry.objects.all()  # All inquiries for superusers
+        all_inquiry = Inquiry.objects.all()
         context = {
             'all_inquiry': all_inquiry,
             'is_superuser': True,
             'all_employees': all_employees,
         }
     else:
-        # If the user is not a superuser, filter inquiries by the employee they are associated with
         employee = Employee.objects.filter(user=req.user).first()
         context = {
             'is_superuser': False,
             'all_employees': [employee] if employee else [],
         }
 
-        # Filter inquiries based on called_received_by matching the employee's first and last name
         if employee:
-            # Split the employee's full name into first and last name
             employee_full_name = f"{employee.first_name} {employee.last_name}"
-            
-            # Filter inquiries where called_received_by matches the employee's full name
             all_inquiry = Inquiry.objects.filter(called_received_by__icontains=employee_full_name)
         else:
-            all_inquiry = Inquiry.objects.none()  # No inquiries if there's no associated employee
+            all_inquiry = Inquiry.objects.none()
 
         context['all_inquiry'] = all_inquiry
 
     return render(req, "inquiry/inquiry_status.html", context)
 
+# ----------------------------------------
 
-
+# View for updating inquiry status
 @login_required
 def update_inquiry_status(req, inquiry_id):
     inquiry = Inquiry.objects.get(id=inquiry_id)
     
     if req.method == "POST":
         status = req.POST.get("status_of_inquiry")
-        inquiry.status = status  # Set status based on selected value
+        inquiry.status = status
         inquiry.save()
         create_log(f"Status of {inquiry.customer_name}'s inquiry changed to {status}", req.user)
 
-        return redirect('inquiry_status')  # Redirect back to the inquiry status page
-    return redirect('inquiry_status')  # Handle GET requests
+        return redirect('inquiry_status')
+    return redirect('inquiry_status')
 
+# ----------------------------------------
 
-
+# View for deleting inquiries (admin only)
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def delete_inquiry(request, inquiry_id):
-    # Get the employee object based on the ID
     inquiry = get_object_or_404(Inquiry, id=inquiry_id)
-
     inquiry.delete()  
     create_log(f"deleted inquiry of customer '{inquiry.customer_name}' and company '{inquiry.company_name}'   ", request.user)
-    # Redirect back to the manage employee page or any other page
     return redirect('inquiry_status')
 
+# ----------------------------------------
 
-
+# View for managing employees (admin only)
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def manage_employee(req):
@@ -425,17 +375,16 @@ def manage_employee(req):
     }
     return render (req , "Admin/manage_employee.html",context)
 
+# ----------------------------------------
 
-
+# View for updating employee information (admin only)
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def update_employee(request, employee_id):
-    # Get the employee object based on the ID
     employee = get_object_or_404(Employee, id=employee_id)
-    user = employee.user  # Get the related user
+    user = employee.user
 
     if request.method == 'POST':
-        # Get form data
         employee.first_name = request.POST.get('first_name')
         employee.last_name = request.POST.get('last_name')
         employee.email = request.POST.get('email')
@@ -443,87 +392,67 @@ def update_employee(request, employee_id):
         employee.contact = request.POST.get('contact')
         employee.age = request.POST.get('age')
 
-        user.username = request.POST.get('username')  # Update the associated user's username
-        user.email = request.POST.get('email')  # Update the associated user's email
+        user.username = request.POST.get('username')
+        user.email = request.POST.get('email')
 
-        # Get the passwords from the form
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirm_password')
 
-        # Validate password fields
-        if password:  # Check if password field is provided
+        if password:
             if password != confirm_password:
                 return render(request, 'Admin/update_employee.html', {
                     'employee': employee,
-                    'error': 'Passwords do not match',  # Pass error message
+                    'error': 'Passwords do not match',
                     'username': user.username,
                 })
             else:
-                # Only update the password if it is provided and valid
                 user.set_password(password)
 
-        # Handle profile image update (optional)
         if 'profile_image' in request.FILES:
             employee.profile_image = request.FILES['profile_image']
 
-        # Save the updated data
         user.save()
         employee.save()
         create_log(f"employee of name '{employee.first_name}{employee.last_name}' is updated", request.user)
 
-
-        # Redirect back to manage employee page or any other page
         return redirect('manage_employee')
 
-    # Pass the employee object to the template for displaying current data
     context = {
         'employee': employee,
-        'username': user.username,  # Pass the username to the template
+        'username': user.username,
         'password': user.password
-
-
     }
 
     return render(request, 'Admin/update_employee.html', context)
 
+# ----------------------------------------
 
-
-
-
+# View for deleting employees (admin only)
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def delete_employee(request, employee_id):
-    # Get the employee object based on the ID
     employee = get_object_or_404(Employee, id=employee_id)
-
-    # Delete the associated user and the employee
     user = employee.user
-    user.delete()  # This will also delete the employee due to the OneToOneField
+    user.delete()
     create_log(f"employee of name '{employee.first_name}{employee.last_name}' is deleted", request.user)
-
-
-    # Redirect back to the manage employee page or any other page
     return redirect('manage_employee')
 
+# ----------------------------------------
 
-
-
+# View for displaying cheque reports
 @login_required
 def cheque_reports(request):
     all_employees = Employee.objects.all()
     
-    # Check if the user is a superuser or an employee
     if request.user.is_superuser:
-        # Superuser sees all cheques
         all_cheques = Cheque.objects.filter(diposited=False)
     else:
-        # Non-superusers (employees) only see cheques handled by them
         employee = Employee.objects.filter(user=request.user).first()
         if employee:
             full_name = f"{employee.first_name} {employee.last_name}"
             all_cheques = Cheque.objects.filter(handled_by=full_name, diposited=False)
         else:
-            all_cheques = []  # No employee record, no cheques to show
+            all_cheques = []
 
     context = {
         'all_cheques': all_cheques,
@@ -533,18 +462,16 @@ def cheque_reports(request):
     
     return render(request, "cheque/cheque_reports.html", context)
 
+# ----------------------------------------
 
-
+# View for displaying pending cheque reports
 @login_required
 def pending_cheque_reports(request):
     all_employees = Employee.objects.all()
 
-    # Check if the user is a superuser or an employee
     if request.user.is_superuser:
-        # Superuser sees all pending cheques
         all_cheques = Cheque.objects.filter(diposited=True, pending_status=True)
     else:
-        # Non-superusers (employees) only see pending cheques handled by them
         employee = Employee.objects.filter(user=request.user).first()
         if employee:
             full_name = f"{employee.first_name} {employee.last_name}"
@@ -552,7 +479,7 @@ def pending_cheque_reports(request):
                 handled_by=full_name, diposited=True, pending_status=True
             )
         else:
-            all_cheques = []  # No employee record, no cheques to show
+            all_cheques = []
 
     context = {
         'all_cheques': all_cheques,
@@ -562,18 +489,16 @@ def pending_cheque_reports(request):
 
     return render(request, "cheque/pending_cheque_reports.html", context)
 
+# ----------------------------------------
 
-
+# View for displaying completed cheque reports
 @login_required
 def completed_cheque_reports(request):
     all_employees = Employee.objects.all()
 
-    # Check if the user is a superuser or an employee
     if request.user.is_superuser:
-        # Superuser sees all completed cheques
         all_cheques = Cheque.objects.filter(diposited=True, pending_status=False)
     else:
-        # Non-superusers (employees) only see completed cheques handled by them
         employee = Employee.objects.filter(user=request.user).first()
         if employee:
             full_name = f"{employee.first_name} {employee.last_name}"
@@ -581,7 +506,7 @@ def completed_cheque_reports(request):
                 handled_by=full_name, diposited=True, pending_status=False
             )
         else:
-            all_cheques = []  # No employee record, no cheques to show
+            all_cheques = []
 
     context = {
         'all_cheques': all_cheques,
@@ -590,10 +515,10 @@ def completed_cheque_reports(request):
 
     return render(request, "cheque/completed_cheque_reports.html", context)
 
+# ----------------------------------------
 
-
+# View for depositing cheques
 @login_required
-# @user_passes_test(lambda u: u.is_superuser)
 def deposit_cheque(request, cheque_id):
     cheque = get_object_or_404(Cheque, id=cheque_id)
     cheque.diposited = True
@@ -602,10 +527,10 @@ def deposit_cheque(request, cheque_id):
 
     return JsonResponse({'status': 'success'}) 
 
+# ----------------------------------------
 
-
+# View for updating cheque status
 @login_required
-# @user_passes_test(lambda u: u.is_superuser)
 def cheque_update_status(request, cheque_id):
     cheque = get_object_or_404(Cheque, id=cheque_id)
     
@@ -614,151 +539,132 @@ def cheque_update_status(request, cheque_id):
         if cheque_pending_status == "completed":
             cheque.pending_status = False
             create_log(f"cheque of company {cheque.company_name}'s status changed to pending  ", request.user)
-
         else:
             cheque.pending_status = True
             create_log(f"cheque of company {cheque.company_name}'s status changed to completed  ", request.user)
-
         
         cheque.save()
-
         return redirect('pending_cheque_reports')  
 
+# ----------------------------------------
 
-
-
+# View for user profile management
 @login_required
 @prevent_admin_access
 def user_profile(request):
-    # Get the employee object based on the ID
     employee = Employee.objects.filter(user=request.user).first()
-    user = employee.user  # Get the related user
+    user = employee.user
 
     if request.method == 'POST':
-        # Get form data
-        # employee.first_name = request.POST.get('first_name')
-        # employee.last_name = request.POST.get('last_name')
         employee.email = request.POST.get('email')
         employee.address = request.POST.get('address')
         employee.contact = request.POST.get('contact')
         employee.age = request.POST.get('age')
 
-        user.username = request.POST.get('username')  # Update the associated user's username
-        user.email = request.POST.get('email')  # Update the associated user's email
+        user.username = request.POST.get('username')
+        user.email = request.POST.get('email')
 
-        # Get the passwords from the form
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirm_password')
 
-        # Validate password fields
-        if password:  # Check if password field is provided
+        if password:
             if password != confirm_password:
                 return render(request, "profile/user_profile.html", {
                     'employee': employee,
-                    'error': 'Passwords do not match',  # Pass error message
+                    'error': 'Passwords do not match',
                     'username': user.username,
                 })
             else:
-                # Only update the password if it is provided and valid
                 user.set_password(password)
 
-        # Handle profile image update (optional)
         if 'profile_image' in request.FILES:
             employee.profile_image = request.FILES['profile_image']
 
-        # Save the updated data
         user.save()
         employee.save()
         create_log(f"employee profile updated of '{employee.first_name}{employee.last_name}'", request.user)
 
-
-        # Redirect back to manage employee page or any other page
         return redirect('logout')
 
-    # Pass the employee object to the template for displaying current data
     context = {
         'employee': employee,
-        'username': user.username,  # Pass the username to the template
+        'username': user.username,
         'password': user.password
-
-
     }
 
     return render(request, "profile/user_profile.html", context)
 
+# ----------------------------------------
 
-
+# View for database backup
 def backup_database(request):
     if request.method == 'POST':
-        # Define the path to your current SQLite database
         database_path = settings.DATABASES['default']['NAME']
-
-        # Define the path for the backup file in the media folder
         backup_dir = os.path.join(settings.MEDIA_ROOT, 'backups')
         if not os.path.exists(backup_dir):
             os.makedirs(backup_dir)
 
-        # Create a backup filename with a timestamp
         timestamp = timezone.now().strftime('%Y%m%d%H%M%S')
         backup_filename = f"backup_{timestamp}.sqlite3"
         backup_path = os.path.join(backup_dir, backup_filename)
 
-        # Copy the database to the backup path
         shutil.copy2(database_path, backup_path)
 
-        # Check if the backup file was created successfully
         if os.path.exists(backup_path):
-            # Return the JSON response with a message and the filename
             create_log(f"backup created successfully  ", request.user)
-
             return JsonResponse({"message": "Database backup created successfully.", "backup_filename": backup_filename})
         else:
-            
             create_log(f"Failed to create a backup  ", request.user)
             return JsonResponse({"message": "Failed to create a backup."}, status=500)
 
     return JsonResponse({"message": "Invalid request method."}, status=400)
 
+# ----------------------------------------
 
-
+# View for database restoration
 def restore_database(request):
     if request.method == 'POST' and request.FILES.get('backup_file'):
-        # Get the uploaded file
         backup_file = request.FILES['backup_file']
-
-        # Define the path to the current SQLite database
         database_path = settings.DATABASES['default']['NAME']
-
-        # Save the uploaded backup file temporarily
         fs = FileSystemStorage()
         temp_backup_path = fs.save(backup_file.name, backup_file)
-        temp_backup_full_path = fs.path(temp_backup_path)  # Get the full path of the saved backup
+        temp_backup_full_path = fs.path(temp_backup_path)
 
-        # Check if the uploaded backup file exists
         if os.path.exists(temp_backup_full_path):
-            # Replace the current database with the uploaded backup
             os.replace(temp_backup_full_path, database_path)
-
             create_log(f"Database restored successfully  ", request.user)
             return JsonResponse({"message": "Database restored successfully."})
         else:
-            
             create_log(f"Backup file not found.  ", request.user)
             return JsonResponse({"message": "Backup file not found."}, status=404)
 
     return JsonResponse({"message": "No file uploaded or invalid request."}, status=400)
 
+# ----------------------------------------
 
-
-
-
+# View for activity logs
 def activity_log(request):
-    # Check if the logs are empty
     if not ActivityLog.objects.exists():
-        # Add two default logs
         ActivityLog.objects.create(task="System Initialized", user=request.user, timestamp=timezone.now())
 
-    # Fetch logs ordered by the most recent
     logs = ActivityLog.objects.all().order_by('-timestamp')
-    
     return render(request, 'Admin/activity_log.html', {'logs': logs})
+
+# ----------------------------------------
+
+
+
+
+# View for access denied error
+def error_acces_denied(request):
+    return render(request, '404.html')
+
+# ----------------------------------------
+
+# View for post arena log
+@login_required
+def post_arena_log_view(request):
+    if not request.user.is_superuser and request.user.username != "admin@admin.com":
+        return redirect('error_acces_denied')  
+    return render(request, 'Admin/PublishBlog.html')
+            

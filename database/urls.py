@@ -23,5 +23,9 @@ urlpatterns = [
     path('add-event/', views.add_event, name='add_event'),
     path('update-event/<int:event_id>/', views.update_event, name='update_event'),
     path('delete-event/<int:event_id>/', views.delete_event, name='delete_event'),
+
+
+    # Blogs & Configs
+    path('blog/', views.blog_view, name='blog_view'),
 ]
 

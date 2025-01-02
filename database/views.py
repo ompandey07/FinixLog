@@ -151,3 +151,14 @@ def update_event(request, event_id):
 def delete_event(request, event_id):
     Event.objects.filter(id=event_id).delete()
     return JsonResponse({'status': 'success'})
+
+
+
+
+
+
+
+
+@login_required
+def blog_view (request):
+    return render(request , 'Users/Blogs.html')

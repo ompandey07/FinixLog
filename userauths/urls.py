@@ -6,6 +6,7 @@ from django.conf.urls.static import static
 from django.urls import path
 
 
+
 urlpatterns = [
     
     
@@ -47,6 +48,12 @@ urlpatterns = [
     path('backup/', views.backup_database, name='backup_database'),
     path('restore/', views.restore_database, name='restore_database'),
 
+
+    # for error pages
+    path('error_acces_denied/', views.error_acces_denied , name="error_acces_denied"),
+
+    # For Arena Posts
+    path('arena/', views.post_arena_log_view , name="post_arena_log_view"),
 
 
 

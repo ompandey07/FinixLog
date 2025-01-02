@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logs Arena</title>
+    <link
+      rel="shortcut icon"
+      href="/static/images/Logo.png"
+      type="image/x-icon"
+    />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.1.0/remixicon.min.css" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center h-14">
+                <img src="/static/images/Logo.png   " alt="Logo" class="h-8">
+                <a href="{% url "users_dashboard" %}" class="flex items-center text-gray-700 hover:text-blue-600 ml-8">
+                    <i class="ri-arrow-left-line text-xl"></i>
+                    <span class="ml-2">Back</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="relative overflow-hidden bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 text-white min-h-[600px] flex items-center">
+        <div class="absolute inset-0">
+            <div class="absolute inset-0 bg-[url('https://placehold.co/1920x1080/png')] bg-cover bg-center opacity-10"></div>
+            <div class="absolute inset-0 bg-gradient-to-br from-blue-900/90 via-purple-900/90 to-indigo-900/90"></div>
+            <!-- Animated shapes -->
+            <div class="absolute inset-0 opacity-10">
+                <div class="relative h-full overflow-hidden">
+                    <div class="absolute w-96 h-96 bg-blue-500 rounded-full -top-20 -left-20 animate-pulse"></div>
+                    <div class="absolute w-96 h-96 bg-purple-500 rounded-full top-40 right-20 animate-pulse delay-700"></div>
+                    <div class="absolute w-96 h-96 bg-indigo-500 rounded-full bottom-0 left-1/2 animate-pulse delay-1000"></div>
+                </div>
+            </div>
+        </div>
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+            <div class="text-center">
+                <h1 class="text-6xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-purple-200">
+                    Logs Arena
+                </h1>
+                <p class="text-2xl md:text-3xl mb-12 text-blue-100 max-w-3xl mx-auto">Explore the latest insights in technology and development</p>
+                <div class="flex justify-center">
+                    <div class="relative w-full max-w-2xl">
+                        <div class="relative">
+                            <input 
+                                type="text" 
+                                id="searchInput"
+                                placeholder="Search articles..." 
+                                class="w-full px-6 py-4 pl-14  text-gray-800 text-lg bg-white/10 backdrop-blur-xl border border-white/20 focus:outline-none placeholder-white/60 text-white"
+                            >
+                            <i class="ri-search-2-line absolute left-4 top-1/2 transform -translate-y-1/2 text-white/60 text-2xl"></i>
+                        </div>
+                        <div class="absolute inset-0 -z-10 blur rounded-lg bg-gradient-to-r from-blue-500/30 to-purple-500/30"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="absolute bottom-0 left-0 right-0">
+            <svg class="w-full h-24 text-gray-50" preserveAspectRatio="none" viewBox="0 0 1440 74">
+                <path d="M456.464 0.0433865C277.158 -1.70575 0 50.0141 0 50.0141V74H1440V50.0141C1440 50.0141 1320.4 31.1925 1243.09 27.0276C1099.33 19.2816 1019.08 53.1981 875.138 50.0141C710.527 46.3727 621.108 1.64949 456.464 0.0433865Z" fill="currentColor"></path>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8" id="blogGrid">
+                <!-- Blog cards will be inserted here by JavaScript -->
+            </div>
+
+            <!-- Pagination -->
+            <div class="mt-12 flex justify-center" id="pagination">
+                <button class="px-6 py-2 bg-blue-500 text-white rounded-full mx-1" data-page="1">1</button>
+                <button class="px-6 py-2 bg-gray-200 hover:bg-gray-300 rounded-full mx-1" data-page="2">2</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white shadow-md h-12 flex items-center">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between w-full">
+            <div class="flex items-center">
+                <img src="/static/images/Logo.png" alt="Logo" class="h-6 w-6 mr-3">
+                <span class="text-gray-700 font-medium">Easy Logs</span>
+            </div>
+            <span class="text-gray-500 font-normal text-xs ml-36">Version 1.0</span>
+        </div>
+    </footer>
+
+    <script>
+        const blogs = [
+            {
+                title: "Getting Started with Web Development",
+                description: "Learn the fundamentals of web development including HTML, CSS, and JavaScript...",
+                category: "Web Dev",
+                color: "blue",
+                date: "Jan 2, 2025",
+                readTime: "5 min",
+                image: "https://placehold.co/800x600/png"
+            },
+            {
+                title: "Modern UI Design Principles",
+                description: "Explore the key principles of modern user interface design...",
+                category: "UI Design",
+                color: "emerald",
+                date: "Jan 3, 2025",
+                readTime: "7 min",
+                image: "https://placehold.co/800x600/png"
+            },
+            {
+                title: "Mastering React Hooks",
+                description: "Deep dive into React Hooks and learn how to build efficient components...",
+                category: "React",
+                color: "violet",
+                date: "Jan 4, 2025",
+                readTime: "6 min",
+                image: "https://placehold.co/800x600/png"
+            },
+            {
+                title: "SEO Best Practices 2025",
+                description: "Stay ahead of the curve with these essential SEO strategies...",
+                category: "SEO",
+                color: "amber",
+                date: "Jan 5, 2025",
+                readTime: "4 min",
+                image: "https://placehold.co/800x600/png"
+            },
+            {
+                title: "Cloud Computing Essentials",
+                description: "Understand the fundamentals of cloud computing services...",
+                category: "Cloud",
+                color: "rose",
+                date: "Jan 6, 2025",
+                readTime: "8 min",
+                image: "https://placehold.co/800x600/png"
+            },
+            {
+                title: "DevOps Pipeline Automation",
+                description: "Learn how to build and optimize your DevOps pipeline...",
+                category: "DevOps",
+                color: "cyan",
+                date: "Jan 7, 2025",
+                readTime: "6 min",
+                image: "https://placehold.co/800x600/png"
+            }
+        ];
+
+        let currentPage = 1;
+        const blogsPerPage = 3;
+
+        function createBlogCard(blog) {
+            return `
+                <div class="group bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 h-[500px] flex flex-col">
+                    <div class="relative overflow-hidden h-60">
+                        <img src="${blog.image}" alt="${blog.title}" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300">
+                        <div class="absolute top-4 right-4 bg-${blog.color}-500 text-white px-3 py-1 text-sm rounded-full">${blog.category}</div>
+                    </div>
+                    <div class="p-6 border-l-4 border-${blog.color}-500 flex-grow flex flex-col">
+                        <div class="flex items-center space-x-2 text-sm text-gray-500 mb-3">
+                            <i class="ri-calendar-line"></i>
+                            <span>${blog.date}</span>
+                            <i class="ri-time-line ml-2"></i>
+                            <span>${blog.readTime}</span>
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-800 mb-3 group-hover:text-${blog.color}-600">${blog.title}</h2>
+                        <p class="text-slate-500 mb-6 flex-grow">${blog.description}</p>
+                        <div class="flex justify-between items-center mt-auto">
+                            <a href="#" class="inline-flex items-center space-x-2 text-${blog.color}-500 hover:text-${blog.color}-600">
+                                <span>Read More</span>
+                                <i class="ri-arrow-right-line"></i>
+                            </a>
+                            <div class="flex items-center space-x-2">
+                                <button class="p-1 hover:text-${blog.color}-500"><i class="ri-heart-line"></i></button>
+                                <button class="p-1 hover:text-${blog.color}-500"><i class="ri-share-line"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function displayBlogs(filteredBlogs = blogs) {
+            const startIndex = (currentPage - 1) * blogsPerPage;
+            const endIndex = startIndex + blogsPerPage;
+            const currentBlogs = filteredBlogs.slice(startIndex, endIndex);
+            
+            document.getElementById('blogGrid').innerHTML = currentBlogs.map(createBlogCard).join('');
+        }
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filteredBlogs = blogs.filter(blog => 
+                blog.title.toLowerCase().includes(searchTerm)
+            );
+            currentPage = 1;
+            displayBlogs(filteredBlogs);
+        });
+
+        document.getElementById('pagination').addEventListener('click', (e) => {
+            if (e.target.dataset.page) {
+                currentPage = parseInt(e.target.dataset.page);
+                document.querySelectorAll('[data-page]').forEach(btn => {
+                    btn.classList.toggle('bg-blue-500', btn.dataset.page == currentPage);
+                    btn.classList.toggle('text-white', btn.dataset.page == currentPage);
+                    btn.classList.toggle('bg-gray-200', btn.dataset.page != currentPage);
+                });
+                displayBlogs();
+            }
+        });
+
+        // Initial display
+        displayBlogs();
+    </script>
+</body>
+</html>
