@@ -157,7 +157,6 @@ After running the above commands, you can access the application at `http://127.
     </tr>
   </tbody>
 </table>
->>>>>>> 
 
 ---
 
