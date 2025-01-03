@@ -119,8 +119,56 @@ After running the above commands, you can access the application at `http://127.
 
 ---
 
-## **User Roles & Capabilities**
-<table width="150%"> <thead> <tr> <th>Feature</th> <th>Admin</th> <th>Employee</th> </tr> </thead> <tbody> <tr> <td><strong>Dashboard</strong></td> <td>Full system overview</td> <td>Personal metrics</td> </tr> <tr> <td><strong>Employee Management</strong></td> <td>Full control</td> <td>View only</td> </tr> <tr> <td><strong>Inquiry Management</strong></td> <td>Full access</td> <td>Assigned access</td> </tr> <tr> <td><strong>Cheque Processing</strong></td> <td>Full access</td> <td>Assigned access</td> </tr> <tr> <td><strong>System Backup</strong></td> <td>Full access</td> <td>✗</td> </tr> <tr> <td><strong>Activity Logs</strong></td> <td>Full access</td> <td>✗</td> </tr> <tr> <td><strong>Arena Management</strong></td> <td>Post and manage</td> <td>View only</td> </tr> </tbody> </table>
+## User Roles & Capabilities
+
+<table style="width: 100%; table-layout: fixed;">
+    <thead>
+        <tr>
+            <th style="width: 40%;">Feature</th>
+            <th style="width: 30%;">Admin</th>
+            <th style="width: 30%;">Employee</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Dashboard</strong></td>
+            <td>Full system overview</td>
+            <td>Personal metrics</td>
+        </tr>
+        <tr>
+            <td><strong>Employee Management</strong></td>
+            <td>Full control</td>
+            <td>View only</td>
+        </tr>
+        <tr>
+            <td><strong>Inquiry Management</strong></td>
+            <td>Full access</td>
+            <td>Assigned access</td>
+        </tr>
+        <tr>
+            <td><strong>Cheque Processing</strong></td>
+            <td>Full access</td>
+            <td>Assigned access</td>
+        </tr>
+        <tr>
+            <td><strong>System Backup</strong></td>
+            <td>Full access</td>
+            <td>✗</td>
+        </tr>
+        <tr>
+            <td><strong>Activity Logs</strong></td>
+            <td>Full access</td>
+            <td>✗</td>
+        </tr>
+        <tr>
+            <td><strong>Arena Management</strong></td>
+            <td>Post and manage</td>
+            <td>View only</td>
+        </tr>
+    </tbody>
+</table>
+
+
 
 ---
 
