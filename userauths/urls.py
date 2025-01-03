@@ -54,6 +54,9 @@ urlpatterns = [
 
     # For Arena Posts
     path('arena/', views.post_arena_log_view , name="post_arena_log_view"),
+    path('edit-blog/<int:post_id>/', views.post_arena_log_view, name='edit_blog'),
+    path('manage_arena/', views.manage_blog_view , name="manage_blog_view"),
+    path('delete-post/<int:post_id>/', views.delete_post, name='delete_post'),
 
 
 

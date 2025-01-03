@@ -27,5 +27,6 @@ urlpatterns = [
 
     # Blogs & Configs
     path('blog/', views.blog_view, name='blog_view'),
+    path('blog/<int:post_id>/', views.blog_detail_view, name='blog_detail'),
 ]
 

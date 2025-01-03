@@ -95,129 +95,223 @@
         </div>
     </footer>
 
+   
     <script>
-        const blogs = [
-            {
-                title: "Getting Started with Web Development",
-                description: "Learn the fundamentals of web development including HTML, CSS, and JavaScript...",
-                category: "Web Dev",
-                color: "blue",
-                date: "Jan 2, 2025",
-                readTime: "5 min",
-                image: "https://placehold.co/800x600/png"
-            },
-            {
-                title: "Modern UI Design Principles",
-                description: "Explore the key principles of modern user interface design...",
-                category: "UI Design",
-                color: "emerald",
-                date: "Jan 3, 2025",
-                readTime: "7 min",
-                image: "https://placehold.co/800x600/png"
-            },
-            {
-                title: "Mastering React Hooks",
-                description: "Deep dive into React Hooks and learn how to build efficient components...",
-                category: "React",
-                color: "violet",
-                date: "Jan 4, 2025",
-                readTime: "6 min",
-                image: "https://placehold.co/800x600/png"
-            },
-            {
-                title: "SEO Best Practices 2025",
-                description: "Stay ahead of the curve with these essential SEO strategies...",
-                category: "SEO",
-                color: "amber",
-                date: "Jan 5, 2025",
-                readTime: "4 min",
-                image: "https://placehold.co/800x600/png"
-            },
-            {
-                title: "Cloud Computing Essentials",
-                description: "Understand the fundamentals of cloud computing services...",
-                category: "Cloud",
-                color: "rose",
-                date: "Jan 6, 2025",
-                readTime: "8 min",
-                image: "https://placehold.co/800x600/png"
-            },
-            {
-                title: "DevOps Pipeline Automation",
-                description: "Learn how to build and optimize your DevOps pipeline...",
-                category: "DevOps",
-                color: "cyan",
-                date: "Jan 7, 2025",
-                readTime: "6 min",
-                image: "https://placehold.co/800x600/png"
-            }
-        ];
-
-        let currentPage = 1;
-        const blogsPerPage = 3;
-
+        function getTimeAgo(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const seconds = Math.floor((now - date) / 1000);
+            
+            let interval = Math.floor(seconds / 31536000);
+            if (interval >= 1) return interval + ' year' + (interval === 1 ? '' : 's') + ' ago';
+            
+            interval = Math.floor(seconds / 2592000);
+            if (interval >= 1) return interval + ' month' + (interval === 1 ? '' : 's') + ' ago';
+            
+            interval = Math.floor(seconds / 86400);
+            if (interval >= 1) return interval + ' day' + (interval === 1 ? '' : 's') + ' ago';
+            
+            interval = Math.floor(seconds / 3600);
+            if (interval >= 1) return interval + ' hour' + (interval === 1 ? '' : 's') + ' ago';
+            
+            interval = Math.floor(seconds / 60);
+            if (interval >= 1) return interval + ' minute' + (interval === 1 ? '' : 's') + ' ago';
+            
+            return Math.floor(seconds) + ' second' + (seconds === 1 ? '' : 's') + ' ago';
+        }
+        
         function createBlogCard(blog) {
+            const colorMap = {
+                'WEB_DEV': 'blue',
+                'UI_DESIGN': 'emerald',
+                'REACT': 'violet',
+                'SEO': 'amber',
+                'CLOUD': 'rose',
+                'DEVOPS': 'cyan'
+            };
+            const color = colorMap[blog.category] || 'blue';
+            
             return `
                 <div class="group bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 h-[500px] flex flex-col">
                     <div class="relative overflow-hidden h-60">
                         <img src="${blog.image}" alt="${blog.title}" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300">
-                        <div class="absolute top-4 right-4 bg-${blog.color}-500 text-white px-3 py-1 text-sm rounded-full">${blog.category}</div>
+                        <div class="absolute top-4 right-4 bg-${color}-500 text-white px-3 py-1 text-sm rounded-full">
+                            ${blog.category.replace('_', ' ')}
+                        </div>
                     </div>
-                    <div class="p-6 border-l-4 border-${blog.color}-500 flex-grow flex flex-col">
+                    <div class="p-6 border-l-4 border-${color}-500 flex-grow flex flex-col">
                         <div class="flex items-center space-x-2 text-sm text-gray-500 mb-3">
                             <i class="ri-calendar-line"></i>
-                            <span>${blog.date}</span>
-                            <i class="ri-time-line ml-2"></i>
-                            <span>${blog.readTime}</span>
+                            <span>${getTimeAgo(blog.date)}</span>
                         </div>
-                        <h2 class="text-xl font-bold text-slate-800 mb-3 group-hover:text-${blog.color}-600">${blog.title}</h2>
+                        <h2 class="text-xl font-bold text-slate-800 mb-3 group-hover:text-${color}-600">
+                            ${blog.title}
+                        </h2>
                         <p class="text-slate-500 mb-6 flex-grow">${blog.description}</p>
                         <div class="flex justify-between items-center mt-auto">
-                            <a href="#" class="inline-flex items-center space-x-2 text-${blog.color}-500 hover:text-${blog.color}-600">
+                            <a href="${BLOG_DETAIL_BASE_URL}${blog.id}/" class="inline-flex items-center space-x-2 text-${color}-500 hover:text-${color}-600">
                                 <span>Read More</span>
                                 <i class="ri-arrow-right-line"></i>
                             </a>
-                            <div class="flex items-center space-x-2">
-                                <button class="p-1 hover:text-${blog.color}-500"><i class="ri-heart-line"></i></button>
-                                <button class="p-1 hover:text-${blog.color}-500"><i class="ri-share-line"></i></button>
+                            <div class="flex items-center space-x-2 text-sm text-gray-500">
+                                <i class="ri-time-line"></i>
+                                <span>Created ${new Date(blog.date).toLocaleDateString()}</span>
                             </div>
                         </div>
                     </div>
                 </div>
             `;
         }
-
-        function displayBlogs(filteredBlogs = blogs) {
-            const startIndex = (currentPage - 1) * blogsPerPage;
-            const endIndex = startIndex + blogsPerPage;
-            const currentBlogs = filteredBlogs.slice(startIndex, endIndex);
+        
+        function createPagination(currentPage, totalPages) {
+            const pages = [];
+            const maxVisible = 5;
             
-            document.getElementById('blogGrid').innerHTML = currentBlogs.map(createBlogCard).join('');
+            // Always show first page
+            pages.push(1);
+            
+            if (totalPages <= maxVisible) {
+                // Show all pages if total is less than maxVisible
+                for (let i = 2; i <= totalPages; i++) {
+                    pages.push(i);
+                }
+            } else {
+                // Complex pagination logic
+                const leftSide = Math.floor(maxVisible / 2);
+                const rightSide = maxVisible - leftSide - 1;
+                
+                if (currentPage > leftSide + 1) {
+                    pages.push('...');
+                }
+                
+                // Calculate start and end pages
+                let start = Math.max(2, currentPage - leftSide);
+                let end = Math.min(totalPages - 1, currentPage + rightSide);
+                
+                // Adjust if at edges
+                if (currentPage <= leftSide + 1) {
+                    end = maxVisible - 1;
+                }
+                if (currentPage >= totalPages - rightSide) {
+                    start = totalPages - maxVisible + 2;
+                }
+                
+                // Add middle pages
+                for (let i = start; i <= end; i++) {
+                    pages.push(i);
+                }
+                
+                if (end < totalPages - 1) {
+                    pages.push('...');
+                }
+                
+                // Always show last page if not already included
+                if (end < totalPages) {
+                    pages.push(totalPages);
+                }
+            }
+            
+            const paginationHTML = `
+                <div class="flex items-center space-x-2">
+                    <button class="px-3 py-2 rounded-full ${currentPage === 1 ? 'bg-gray-200 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'}" 
+                            ${currentPage === 1 ? 'disabled' : ''} 
+                            onclick="changePage(${currentPage - 1})">
+                        <i class="ri-arrow-left-line"></i>
+                    </button>
+                    ${pages.map(page => {
+                        if (page === '...') {
+                            return '<span class="px-3 py-2">...</span>';
+                        }
+                        return `
+                            <button class="px-4 py-2 rounded-full ${currentPage === page ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'}" 
+                                    onclick="changePage(${page})">
+                                ${page}
+                            </button>
+                        `;
+                    }).join('')}
+                    <button class="px-3 py-2 rounded-full ${currentPage === totalPages ? 'bg-gray-200 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'}" 
+                            ${currentPage === totalPages ? 'disabled' : ''} 
+                            onclick="changePage(${currentPage + 1})">
+                        <i class="ri-arrow-right-line"></i>
+                    </button>
+                </div>
+            `;
+            
+            document.getElementById('pagination').innerHTML = paginationHTML;
         }
-
-        document.getElementById('searchInput').addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            const filteredBlogs = blogs.filter(blog => 
-                blog.title.toLowerCase().includes(searchTerm)
+        
+        function changePage(page) {
+            window.location.href = `?page=${page}`;
+        }
+        
+        // Filter function for search
+        function filterPosts(searchTerm, posts) {
+            return posts.filter(post => 
+                post.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                post.description.toLowerCase().includes(searchTerm.toLowerCase())
             );
-            currentPage = 1;
-            displayBlogs(filteredBlogs);
-        });
-
-        document.getElementById('pagination').addEventListener('click', (e) => {
-            if (e.target.dataset.page) {
-                currentPage = parseInt(e.target.dataset.page);
-                document.querySelectorAll('[data-page]').forEach(btn => {
-                    btn.classList.toggle('bg-blue-500', btn.dataset.page == currentPage);
-                    btn.classList.toggle('text-white', btn.dataset.page == currentPage);
-                    btn.classList.toggle('bg-gray-200', btn.dataset.page != currentPage);
-                });
-                displayBlogs();
+        }
+        
+        // Initial display of blogs and pagination
+        document.addEventListener('DOMContentLoaded', () => {
+            const blogGrid = document.getElementById('blogGrid');
+            const postsDataElement = document.getElementById('posts-data');
+            const currentPageElement = document.getElementById('current-page');
+            const totalPagesElement = document.getElementById('total-pages');
+            
+            if (!postsDataElement || !currentPageElement || !totalPagesElement) {
+                console.error('Required elements not found');
+                return;
+            }
+        
+            try {
+                const posts = JSON.parse(postsDataElement.textContent);
+                const currentPage = parseInt(currentPageElement.textContent);
+                const totalPages = parseInt(totalPagesElement.textContent);
+                
+                if (blogGrid) {
+                    blogGrid.innerHTML = posts.map(createBlogCard).join('');
+                }
+                
+                createPagination(currentPage, totalPages);
+                
+                // Initialize search functionality
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput) {
+                    searchInput.addEventListener('input', (e) => {
+                        const filteredPosts = filterPosts(e.target.value, posts);
+                        if (blogGrid) {
+                            blogGrid.innerHTML = filteredPosts.map(createBlogCard).join('');
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error initializing blog display:', error);
             }
         });
-
-        // Initial display
-        displayBlogs();
     </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Add this before the closing </body> tag -->
+<script id="posts-data" type="application/json">
+    {{ posts_json|safe }}
+</script>
+<script type="text/plain" id="current-page">{{ current_page }}</script>
+<script type="text/plain" id="total-pages">{{ total_pages }}</script>
+<script>
+    // Add this at the top of your scripts
+    const BLOG_DETAIL_BASE_URL = '/blog/';
+</script>
 </body>
 </html>

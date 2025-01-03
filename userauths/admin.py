@@ -1,9 +1,10 @@
 from django.contrib import admin
-from .models import Employee,Inquiry,Cheque
+from .models import Employee,Inquiry,Cheque , BlogPost
 # Register your models here.
 
 
 
 admin.site.register(Employee),
 admin.site.register(Inquiry),
-admin.site.register(Cheque)
+admin.site.register(Cheque),
+admin.site.register(BlogPost),

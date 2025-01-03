@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Post</title>
+    <title>Post Arena</title>
     <link
     rel="shortcut icon"
     href="/static/images/Logo.png"
@@ -18,7 +18,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center h-14">
                 <img src="/static/images/Logo.png" alt="Logo" class="h-8">
-                <a href="/admin_dashboard" class="flex items-center text-gray-700 hover:text-blue-600 ml-8">
+                <a href="{% url "manage_blog_view" %}" class="flex items-center text-gray-700 hover:text-blue-600 ml-8">
                     <i class="ri-arrow-left-line text-xl"></i>
                     <span class="ml-2">Back</span>
                 </a>
@@ -31,67 +31,68 @@
             <h1 class="text-3xl font-bold text-gray-900 mb-8">
                 <i class="ri-lightbulb-fill text-yellow-500 mr-2"></i> Express & Inspire
             </h1>                        
-            <form id="blogForm" class="bg-white shadow-lg p-8">
+            <form id="blogForm" class="bg-white shadow-lg p-8" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
                 <div class="grid grid-cols-3 gap-8">
                     <!-- Left Column -->
                     <div class="col-span-1 flex items-center">
                         <div class="relative w-full">
-                            <input type="file" id="imageInput" accept="image/*" class="hidden">
+                            <input type="file" id="imageInput" name="imageInput" accept="image/*" class="hidden">
                             <div id="uploadCircle" 
                                 class="w-64 h-64 mx-auto border-2 border-dashed border-gray-300 rounded-full flex items-center justify-center cursor-pointer overflow-hidden group"
                                 onclick="document.getElementById('imageInput').click()">
-                                <div id="uploadIcon" class="text-gray-400 group-hover:text-blue-500">
+                                <div id="uploadIcon" class="text-gray-400 group-hover:text-blue-500 {% if post.image %}hidden{% endif %}">
                                     <i class="ri-image-add-line text-6xl"></i>
                                     <p class="mt-2 text-sm">Upload Image</p>
                                 </div>
-                                <img id="preview" src="" alt="Preview" class="hidden absolute w-full h-full object-cover">
+                                <img id="preview" src="{% if post.image %}{{ post.image.url }}{% endif %}" 
+                                     alt="Preview" class="{% if not post.image %}hidden{% endif %} absolute w-full h-full object-cover">
                             </div>
                         </div>
                     </div>
-
+            
                     <!-- Right Column -->
                     <div class="col-span-2">
-                        <form method="post">
-                            <div class="grid gap-6">
-                                <div>
-                                    <label for="title" class="block text-gray-700 text-sm font-medium mb-2">
-                                        <i class="ri-text text-xl text-blue-500 mr-2"></i>Blog Title
-                                    </label>
-                                    <input type="text" id="title" name="title" 
-                                        class="w-full p-3 border border-gray-300 focus:border-blue-500 focus:outline-none">
-                                </div>
-    
-                                <div>
-                                    <label for="category" class="block text-gray-700 text-sm font-medium mb-2">
-                                        <i class="ri-price-tag-3-line text-xl text-emerald-500 mr-2"></i>Category
-                                    </label>
-                                    <select id="category" name="category" 
-                                        class="w-full p-3 border border-gray-300 focus:border-blue-500 focus:outline-none">
-                                        <option value="web-dev">Web Development</option>
-                                        <option value="ui-design">UI Design</option>
-                                        <option value="react">React</option>
-                                        <option value="seo">SEO</option>
-                                        <option value="cloud">Cloud</option>
-                                        <option value="devops">DevOps</option>
-                                    </select>
-                                </div>
-    
-                                <div>
-                                    <label for="description" class="block text-gray-700 text-sm font-medium mb-2">
-                                        <i class="ri-file-text-line text-xl text-purple-500 mr-2"></i>Blog Content
-                                    </label>
-                                    <textarea id="description" name="description" rows="8" 
-                                        class="w-full p-3 border border-gray-300 focus:border-blue-500 focus:outline-none"></textarea>
-                                </div>
-    
-                                <div class="flex justify-end">
-                                    <button type="submit" class="bg-blue-500 text-white px-8 py-3 flex items-center">
-                                        <i class="ri-send-plane-fill mr-2"></i>
-                                        Publish Blog
-                                    </button>
-                                </div>
+                        <div class="grid gap-6">
+                            <div>
+                                <label for="title" class="block text-gray-700 text-sm font-medium mb-2">
+                                    <i class="ri-text text-xl text-blue-500 mr-2"></i>Blog Title *
+                                </label>
+                                <input type="text" id="title" name="title" required
+                                    value="{{ post.title|default:'' }}"
+                                    class="w-full p-3 border border-gray-300 focus:border-blue-500 focus:outline-none">
                             </div>
-                        </form>
+            
+                            <div>
+                                <label for="category" class="block text-gray-700 text-sm font-medium mb-2">
+                                    <i class="ri-price-tag-3-line text-xl text-emerald-500 mr-2"></i>Category *
+                                </label>
+                                <select id="category" name="category" required
+                                    class="w-full p-3 border border-gray-300 focus:border-blue-500 focus:outline-none">
+                                    {% for value, label in categories %}
+                                        <option value="{{ value }}" 
+                                            {% if post.category == value %}selected{% endif %}>
+                                            {{ label }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+            
+                            <div>
+                                <label for="description" class="block text-gray-700 text-sm font-medium mb-2">
+                                    <i class="ri-file-text-line text-xl text-purple-500 mr-2"></i>Blog Content
+                                </label>
+                                <textarea id="description" name="description" rows="8" 
+                                    class="w-full p-3 border border-gray-300 focus:border-blue-500 focus:outline-none">{{ post.content|default:'' }}</textarea>
+                            </div>
+            
+                            <div class="flex justify-end">
+                                <button type="submit" class="bg-blue-500 text-white px-8 py-3 flex items-center">
+                                    <i class="ri-send-plane-fill mr-2"></i>
+                                    {{ post|yesno:"Update,Publish" }} Blog
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </form>
@@ -107,6 +108,82 @@
             <span class="text-gray-500 font-normal text-xs ml-36">Version 1.0</span>
         </div>
     </footer>
+
+
+
+    <!-- Success Modal -->
+<div id="successModal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/50 transition-opacity duration-300"></div>
+    <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+        <div class="bg-white p-8 flex flex-col items-center max-w-md w-full mx-4 transform transition-all duration-300 scale-95 opacity-0">
+            <!-- Icon will be injected here -->
+            <div id="modalIcon" class="mb-4 text-6xl"></div>
+            
+            <!-- Message -->
+            <p id="modalMessage" class="text-gray-800 text-lg text-center mb-6"></p>
+            
+            <!-- Close button -->
+            <button id="modalClose" class="text-gray-500 hover:text-gray-700 flex items-center">
+                <i class="ri-close-circle-line mr-2"></i>
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Add this JavaScript before closing body tag -->
+<script>
+function showSuccessModal(message, isPublished = true) {
+    const modal = document.getElementById('successModal');
+    const modalContent = modal.querySelector('.bg-white');
+    const modalMessage = document.getElementById('modalMessage');
+    const modalIcon = document.getElementById('modalIcon');
+    
+    // Set message
+    modalMessage.textContent = message;
+    
+    // Set icon based on action
+    if (isPublished) {
+        modalIcon.innerHTML = '<i class="ri-article-line text-green-500"></i>';
+    } else {
+        modalIcon.innerHTML = '<i class="ri-edit-circle-line text-blue-500"></i>';
+    }
+    
+    // Show modal
+    modal.classList.remove('hidden');
+    
+    // Animate in
+    setTimeout(() => {
+        modalContent.classList.remove('scale-95', 'opacity-0');
+        modalContent.classList.add('scale-100', 'opacity-100');
+    }, 10);
+    
+    // Auto dismiss after 3 seconds
+    const timeout = setTimeout(() => {
+        closeModal();
+    }, 3000);
+    
+    // Close button handler
+    document.getElementById('modalClose').onclick = () => {
+        clearTimeout(timeout);
+        closeModal();
+    };
+}
+
+function closeModal() {
+    const modal = document.getElementById('successModal');
+    const modalContent = modal.querySelector('.bg-white');
+    
+    // Animate out
+    modalContent.classList.remove('scale-100', 'opacity-100');
+    modalContent.classList.add('scale-95', 'opacity-0');
+    
+    // Hide modal after animation
+    setTimeout(() => {
+        modal.classList.add('hidden');
+    }, 300);
+}
+</script>
 
     <!-- Script remains same -->
     <script>
@@ -129,5 +206,13 @@
 
        
     </script>
+
+    {% if success_message %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        showSuccessModal('{{ success_message }}', {{ is_published|yesno:"true,false" }});
+    });
+</script>
+{% endif %}
 </body>
 </html>

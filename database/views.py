@@ -3,15 +3,18 @@ from .models import Crm_Contacts , Crm_Notes , Event
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 import json
-from userauths.models import Employee
+from userauths.models import Employee , BlogPost
 from userauths.utils import create_log
 import shutil
 import os
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render, get_object_or_404, redirect
+from django.core.serializers.json import DjangoJSONEncoder
+
 
 
 
@@ -179,5 +182,59 @@ def delete_event(request, event_id):
 #? ----------------------------------------------------------------------------------------------------------------------------
 # Blog View (for Users)
 @login_required
-def blog_view (request):
-    return render(request , 'Users/Blogs.html')
+def blog_view(request):
+    # Get page number from request, default to 1
+    page = request.GET.get('page', 1)
+    posts_per_page = 3
+    
+    # Get all blog posts ordered by creation date
+    blog_posts = BlogPost.objects.all().order_by('-created_at')
+    
+    # Set up pagination
+    paginator = Paginator(blog_posts, posts_per_page)
+    
+    try:
+        current_posts = paginator.page(page)
+    except PageNotAnInteger:
+        current_posts = paginator.page(1)
+    except EmptyPage:
+        current_posts = paginator.page(paginator.num_pages)
+    
+    # Convert posts to JSON for JavaScript
+    posts_data = [{
+        'id': post.id,
+        'title': post.title,
+        'description': post.content[:200] + '...' if len(post.content) > 200 else post.content,
+        'category': post.category,
+        'date': post.created_at.isoformat(),  # Convert datetime to ISO format string
+        'image': post.image.url if post.image else 'https://placehold.co/800x600/png',
+    } for post in current_posts]
+    
+    # Serialize the data
+    posts_json = json.dumps(posts_data, cls=DjangoJSONEncoder)
+    
+    context = {
+        'posts_json': posts_json,  # Send serialized JSON
+        'total_pages': paginator.num_pages,
+        'current_page': int(page),
+    }
+    
+    return render(request, 'Users/Blogs.html', context)
+
+
+
+
+
+
+#? ----------------------------------------------------------------------------------------------------------------------------
+# Blog Deteiled View (for Users)
+def blog_detail_view(request, post_id):
+    blog = get_object_or_404(BlogPost, id=post_id)
+    tags = blog.tags.all() if hasattr(blog, 'tags') else []
+    
+    context = {
+        'blog': blog,
+        'tags': tags,
+    }
+    
+    return render(request, 'Users/BlogDetailedView.html', context)

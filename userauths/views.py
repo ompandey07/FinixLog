@@ -1,12 +1,12 @@
 # Authentication and model imports
 from django.contrib.auth import authenticate, login , logout
-from .models import Employee,Inquiry,Cheque,ActivityLog
+from .models import Employee,Inquiry,Cheque,ActivityLog , BlogPost
 from database.models import Crm_Contacts
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
-from django.http import HttpResponseRedirect
+from django.contrib import messages
 import shutil
 from django.utils import timezone
 import os
@@ -14,6 +14,10 @@ from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from .utils import create_log
 from django.contrib.auth.models import User
+from django.views.decorators.http import require_http_methods
+
+
+
 
 
 
@@ -723,8 +727,97 @@ def error_acces_denied(request):
 
 # View for post arena log
 @login_required
-def post_arena_log_view(request):
+def post_arena_log_view(request, post_id=None):
     if not request.user.is_superuser and request.user.username != "admin@admin.com":
-        return redirect('error_acces_denied')  
-    return render(request, 'Admin/PublishBlog.html')
-            
+        return redirect('error_acces_denied')
+
+    post = None  # Initialize post as None in case it's not found
+
+    if post_id:
+        # Check if post_id is provided (for editing)
+        post = get_object_or_404(BlogPost, id=post_id)
+
+    if request.method == 'POST':
+        try:
+            # Extract form data
+            title = request.POST.get('title')
+            content = request.POST.get('description')
+            category = request.POST.get('category')
+            new_image = request.FILES.get('imageInput')
+
+            # Validate required fields
+            if not all([title, category]):
+                messages.error(request, 'Title and category are required')
+                return render(request, 'Admin/PublishBlog.html', {
+                    'categories': BlogPost.CATEGORY_CHOICES,
+                    'post': post  # Pass post to the template for editing
+                })
+
+            if post:
+                # Update existing post
+                post.title = title
+                post.content = content
+                post.category = category.upper()
+                if new_image:
+                    post.image = new_image
+                post.save()
+                return render(request, 'Admin/PublishBlog.html', {
+                    'categories': BlogPost.CATEGORY_CHOICES,
+                    'post': post,
+                    'success_message': 'Blog post updated successfully!',
+                    'is_published': False
+                })
+            else:
+                # Create new post
+                BlogPost.objects.create(
+                    title=title,
+                    content=content,
+                    category=category.upper(),
+                    image=new_image if new_image else None,
+                    author=request.user
+                )
+                return render(request, 'Admin/PublishBlog.html', {
+                    'categories': BlogPost.CATEGORY_CHOICES,
+                    'success_message': 'Blog post published successfully!',
+                    'is_published': True
+                })
+
+        except Exception as e:
+            messages.error(request, f'Error with blog post: {str(e)}')
+
+    return render(request, 'Admin/PublishBlog.html', {
+        'categories': BlogPost.CATEGORY_CHOICES,
+        'post': post  # Pass post to the template for editing if it's provided
+    })
+
+
+
+
+#? -------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# View for manage blog posts
+@login_required
+def manage_blog_view(request):
+    if not request.user.is_superuser and request.user.username != "admin@admin.com":
+        return redirect('error_acces_denied')
+
+    posts = BlogPost.objects.select_related('author').all()
+    categories = dict(BlogPost.CATEGORY_CHOICES)
+    return render(request, 'Admin/ManageBlogs.html', {'posts': posts, 'categories': categories})
+
+
+
+
+#? -------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# View for delete blog posts
+@require_http_methods(["GET", "POST"]) # type: ignore
+def delete_post(request, post_id):
+    try:
+        post = get_object_or_404(BlogPost, id=post_id)
+        post.delete()
+        # Redirect to the blog management page after deletion
+        return redirect('manage_blog_view')
+    except Exception as e:
+        # Handle errors gracefully
+        return redirect('manage_blog_view', error="Failed to delete post.")
