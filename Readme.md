@@ -1,6 +1,6 @@
 
-# **EasyLogs**  ** A Django-Based Business Management System **
-Created by ** Om Pandey **
+# **EasyLogs** A Django-Based Business Management System 
+Created by :  <a href="https://www.omkumarpandey.com.np/" target="_blank">Om Pandey</a>
 EasyLogs is a comprehensive business management system designed to streamline inquiry and cheque management processes using Django, a high-level Python web framework. This system leverages Django's robust features to enhance operational efficiency and user experience.
 
 ---
