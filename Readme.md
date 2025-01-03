@@ -116,18 +116,7 @@ After running the above commands, you can access the application at `http://127.
 ---
 
 ## **User Roles & Capabilities**
-
-<<<<<<< HEAD
-| Feature                 | Admin               | Employee         |
-|-------------------------|---------------------|------------------|
-| **Dashboard**            | Full system overview| Personal metrics |
-| **Employee Management**  | Full control        | View only        |
-| **Inquiry Management**   | Full access         | Assigned access  |
-| **Cheque Processing**    | Full access         | Assigned access  |
-| **System Backup**        | Full access         | ✗                |
-| **Activity Logs**        | Full access         | ✗                |
-=======
-<table width="90%">
+<table width="150%">
   <thead>
     <tr>
       <th>Feature</th>
@@ -168,7 +157,6 @@ After running the above commands, you can access the application at `http://127.
     </tr>
   </tbody>
 </table>
->>>>>>> 965fe6552d385dae5f5314a51abd7318a4670439
 
 ---
 
@@ -225,7 +213,7 @@ We welcome contributions to EasyLogs! To get started, please follow these steps:
 
 ## **License**
 
-MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License
 
 ---
 
