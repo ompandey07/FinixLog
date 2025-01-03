@@ -38,7 +38,7 @@ Created by **Om Pandey**
 - Validation checks for transaction integrity  
 - Restricted access control for sensitive financial data
 
-- ### **Arena Module**
+ ### **Arena Module**
 - Admins can create, post, and manage blog-like content (Arenas)  
 - Employees can only view and read the arenas (view-only access)
 
