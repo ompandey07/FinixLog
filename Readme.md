@@ -229,8 +229,11 @@ We welcome contributions to EasyLogs! To get started, please follow these steps:
 
 ## **License**
 
-MIT License
+This project is licensed under the MIT License - see the <a href="https://en.wikipedia.org/wiki/MIT_License" target="_blank">LICENSE</a> file for details.
 
 ---
 
 **Created by Om Pandey © 2024**
+
+This is an open-source project. Contributions are welcome! You can fix the repo, open issues, and submit pull requests.
+
