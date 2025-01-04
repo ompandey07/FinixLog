@@ -1,0 +1,472 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EASY LOGS</title>
+    <link
+      rel="shortcut icon"
+      href="/static/images/logo.png"
+      type="image/x-icon"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.1.0/remixicon.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <style>
+      /* Hide scrollbar but keep functionality */
+      /* Hide scrollbar for Webkit browsers */
+      body {
+        overflow: auto; /* Ensure scrolling is enabled */
+      }
+
+      body::-webkit-scrollbar {
+        display: none; /* Hide the scrollbar */
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes gradientMove {
+        0% {
+          transform: translate(0%, 0%);
+        }
+        50% {
+          transform: translate(-30%, -30%);
+        }
+        100% {
+          transform: translate(0%, 0%);
+        }
+      }
+
+      .animate-fadeInUp {
+        animation: fadeInUp 0.8s ease forwards;
+        opacity: 0;
+      }
+
+      .animate-delay-200 {
+        animation-delay: 0.2s;
+      }
+
+      .animate-delay-400 {
+        animation-delay: 0.4s;
+      }
+
+      .animate-delay-600 {
+        animation-delay: 0.6s;
+      }
+
+      .gradient-bg {
+        animation: gradientMove 15s ease infinite;
+      }
+
+      .hover-up {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .hover-up:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 30px -5px rgba(37, 99, 235, 0.2);
+      }
+
+      .nav-blur {
+        backdrop-filter: blur(8px);
+        background: rgba(0, 0, 0, 0.8);
+      }
+
+      .feature-card {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.6s ease;
+      }
+
+      .feature-card.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* Page Background */
+      .page-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+      }
+
+      @media (min-width: 2560px) {
+        .ultra-container {
+          max-width: 2400px;
+          margin: 0 auto;
+          padding: 0 2rem;
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-black text-white overflow-x-hidden">
+    <!-- Fixed Background -->
+    <div class="page-background">
+      <div class="absolute inset-0 bg-black">
+        <div class="absolute inset-0 opacity-30 gradient-bg">
+          <div
+            class="absolute inset-[-50%] bg-[radial-gradient(circle_at_50%_50%,#2563eb,transparent_50%)]"
+          ></div>
+        </div>
+      </div>
+      <div class="absolute inset-0 opacity-10">
+        <div
+          class="h-full w-full"
+          style="
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCI+PHBhdGggZD0iTTAgMGg2MHY2MEgweiIgZmlsbD0ibm9uZSIvPjxwYXRoIGQ9Ik0zMCAzMCBMMCAwIEw2MCA2MCBNMzAgMzAgTDYwIDAgTDAgNjAiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMC41Ii8+PC9zdmc+');
+          "
+        ></div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 bg-transparent">
+      <div class="ultra-container mx-auto px-4">
+        <div class="flex justify-between items-center h-16">
+          <div class="flex items-center gap-12">
+            <div class="flex items-center gap-3">
+              <img
+                src="/static/images/logo.png"
+                alt="Logo"
+                class="h-8 2xl:h-10"
+              />
+              <span
+                class="text-xl 2xl:text-2xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent"
+                >EASY LOGS</span
+              >
+            </div>
+          </div>
+          <div class="flex items-center gap-4">
+            <a
+              href="{% url 'login_page' %}"
+              class="flex items-center gap-2 px-6 py-2 hover:text-blue-700 transition-all text-base"
+            >
+              <i class="ri-user-line"></i>
+              Login
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative min-h-screen flex items-center pt-16">
+      <div class="ultra-container mx-auto px-4 relative z-10">
+        <div class="max-w-6xl mx-auto">
+          <div class="grid lg:grid-cols-2 gap-12 items-center">
+            <!-- Left Column -->
+            <div class="space-y-8">
+              <h1
+                class="animate-fadeInUp text-5xl md:text-6xl lg:text-7xl 2xl:text-8xl font-bold"
+              >
+                <span
+                  class="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent"
+                  >Easy</span
+                >
+                <span
+                  class="bg-gradient-to-r from-green-400 to-green-600 bg-clip-text text-transparent"
+                  >Logs</span
+                >
+              </h1>
+              <p
+                class="animate-fadeInUp animate-delay-200 text-xl md:text-2xl 2xl:text-3xl text-gray-400"
+              >
+                Transform your log management with enterprise-grade analytics
+                and real-time monitoring
+              </p>
+              <div class="animate-fadeInUp animate-delay-400">
+                <a
+                  href="{% url 'login_page' %}"
+                  class="bg-blue-600 hover:bg-blue-700 px-8 py-3 text-lg transition-all hover:shadow-lg hover:shadow-blue-500/25"
+                >
+                  Get Started
+                </a>
+              </div>
+            </div>
+
+            <!-- Right Column - Stats -->
+            <div
+              class="grid grid-cols-2 gap-4 animate-fadeInUp animate-delay-600"
+            >
+              <div
+                class="border border-white/10 p-6 backdrop-blur-sm bg-white/5 hover:bg-white/10 transition-all hover-up"
+              >
+                <div class="flex items-center gap-4 mb-4">
+                  <i class="ri-database-2-line text-3xl text-blue-500"></i>
+                  <h3 class="text-2xl font-bold">100k+</h3>
+                </div>
+                <p class="text-gray-400">Logs Processed Daily</p>
+              </div>
+
+              <div
+                class="border border-white/10 p-6 backdrop-blur-sm bg-white/5 hover:bg-white/10 transition-all hover-up"
+              >
+                <div class="flex items-center gap-4 mb-4">
+                  <i class="ri-timer-line text-3xl text-blue-500"></i>
+                  <h3 class="text-2xl font-bold">99.9%</h3>
+                </div>
+                <p class="text-gray-400">System Uptime</p>
+              </div>
+
+              <div
+                class="border border-white/10 p-6 backdrop-blur-sm bg-white/5 hover:bg-white/10 transition-all hover-up"
+              >
+                <div class="flex items-center gap-4 mb-4">
+                  <i class="ri-speed-line text-3xl text-blue-500"></i>
+                  <h3 class="text-2xl font-bold">50ms</h3>
+                </div>
+                <p class="text-gray-400">Average Response</p>
+              </div>
+
+              <div
+                class="border border-white/10 p-6 backdrop-blur-sm bg-white/5 hover:bg-white/10 transition-all hover-up"
+              >
+                <div class="flex items-center gap-4 mb-4">
+                  <i
+                    class="ri-customer-service-2-line text-3xl text-blue-500"
+                  ></i>
+                  <h3 class="text-2xl font-bold">24/7</h3>
+                </div>
+                <p class="text-gray-400">Expert Support</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Features -->
+    <main class="py-20 relative z-10" id="features">
+      <div class="ultra-container mx-auto px-4">
+        <!-- Dashboard Section -->
+        <section class="mb-32" id="dashboard">
+          <div
+            class="border border-white/10 bg-white/5 backdrop-blur-sm p-8 md:p-12 grid lg:grid-cols-2 gap-12 items-center hover-up feature-card"
+          >
+            <div>
+              <h2 class="text-3xl md:text-4xl 2xl:text-5xl font-bold mb-6">
+                Intelligent Dashboard
+              </h2>
+              <p class="text-xl text-gray-400">
+                Experience comprehensive log analytics with our advanced
+                dashboard. Transform complex data into clear insights with
+                powerful visualization tools.
+              </p>
+            </div>
+            <div class="p-8">
+              <img
+                src="{% static 'MainPage/Dashboard-amico.png' %}"
+                alt="Dashboard"
+                class="w-full h-auto"
+              />
+            </div>
+          </div>
+        </section>
+
+        <!-- Feature Grid -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div
+            class="border border-white/10 bg-white/5 backdrop-blur-sm p-8 hover-up feature-card"
+          >
+            <img
+              src="{% static 'MainPage/Notes.jpg' %}"
+              alt="Smart Notes"
+              class="w-full h-48 2xl:h-64 object-cover mb-8"
+            />
+            <h3 class="text-2xl font-bold mb-4">Smart Notes</h3>
+            <p class="text-gray-400">
+              Advanced note-taking system with intelligent categorization and
+              powerful search capabilities.
+            </p>
+          </div>
+
+          <div
+            class="border border-white/10 bg-white/5 backdrop-blur-sm p-8 hover-up feature-card"
+          >
+            <img
+              src="{% static 'MainPage/Security-amico.png' %}"
+              alt="Security"
+              class="w-full h-48 2xl:h-64 object-contain mb-8"
+            />
+            <h3 class="text-2xl font-bold mb-4">Enterprise Security</h3>
+            <p class="text-gray-400">
+              Military-grade encryption and compliance with international
+              security standards.
+            </p>
+          </div>
+
+          <div
+            class="border border-white/10 bg-white/5 backdrop-blur-sm p-8 hover-up feature-card"
+          >
+            <img
+              src="{% static 'MainPage/Cloud.jpg' %}"
+              alt="Cloud Integration"
+              class="w-full h-48 2xl:h-64 object-cover mb-8"
+            />
+            <h3 class="text-2xl font-bold mb-4">Cloud Integration</h3>
+            <p class="text-gray-400">
+              Seamless integration with major cloud providers for unlimited
+              scalability.
+            </p>
+          </div>
+
+          <div
+            class="border border-white/10 bg-white/5 backdrop-blur-sm p-8 hover-up feature-card"
+          >
+            <img
+              src="{% static 'MainPage/Api.png' %}"
+              alt="API Access"
+              class="w-full h-48 2xl:h-64 object-contain mb-8"
+            />
+            <h3 class="text-2xl font-bold mb-4">Powerful API</h3>
+            <p class="text-gray-400">
+              Comprehensive API suite with extensive documentation and SDK
+              support.
+            </p>
+          </div>
+
+          <div
+            class="border border-white/10 bg-white/5 backdrop-blur-sm p-8 hover-up feature-card"
+          >
+            <img
+              src="{% static 'MainPage/CustomPannel.png' %}"
+              alt="Custom Panel"
+              class="w-full h-48 2xl:h-64 object-contain mb-8"
+            />
+            <h3 class="text-2xl font-bold mb-4">Advanced Console</h3>
+            <p class="text-gray-400">
+              Centralized control panel with role-based access and custom
+              workflows.
+            </p>
+          </div>
+
+          <div
+            class="border border-white/10 bg-white/5 backdrop-blur-sm p-8 hover-up feature-card"
+          >
+            <img
+              src="{% static 'MainPage/ManageBackup.png' %}"
+              alt="Backup Management"
+              class="w-full h-48 2xl:h-64 object-contain mb-8"
+            />
+            <h3 class="text-2xl font-bold mb-4">Smart Backup</h3>
+            <p class="text-gray-400">
+              Automated backup scheduling with versioning and instant recovery.
+            </p>
+          </div>
+
+          <div
+            class="border border-white/10 bg-white/5 backdrop-blur-sm p-8 hover-up feature-card"
+          >
+            <img
+              src="{% static 'MainPage/Arena.png' %}"
+              alt="Arena"
+              class="w-full h-48 2xl:h-64 object-contain mb-8"
+            />
+            <h3 class="text-2xl font-bold mb-4">Collaboration Space</h3>
+            <p class="text-gray-400">
+              Real-time collaboration with integrated chat and version control.
+            </p>
+          </div>
+
+          <div
+            class="border border-white/10 bg-white/5 backdrop-blur-sm p-8 hover-up feature-card"
+          >
+            <img
+              src="{% static 'MainPage/Thesis-amico.png' %}"
+              alt="Reporting"
+              class="w-full h-64 object-contain mb-8"
+            />
+            <h3 class="text-2xl font-bold mb-4">Advanced Analytics</h3>
+            <p class="text-gray-400">
+              Customizable reporting engine with comprehensive insights.
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- WhatsApp Button -->
+    <div class="fixed bottom-6 right-0 z-50">
+      <a
+        href="https://wa.me/919863588895"
+        target="_blank"
+        class="block w-16 xl:w-20"
+      >
+        <img
+          src="{% static 'MainPage/whatsapp.png' %}"
+          alt="WhatsApp"
+          class="w-[50px] hover:scale-110 transition-transform"
+        />
+      </a>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 py-4 relative z-10">
+      <div class="ultra-container mx-auto px-4">
+        <div class="flex justify-center items-center">
+          <a
+            href="https://www.megaminds.com.np/"
+            target="_blank"
+            class="text-gray-400 hover:text-blue-400 transition-colors text-center"
+          >
+            © 2025 Mega Minds Pvt. Ltd. All rights reserved.
+          </a>
+        </div>
+      </div>
+    </footer>
+
+    <!-- JavaScript for animations -->
+    <script>
+      // Initialize GSAP ScrollTrigger
+      gsap.registerPlugin(ScrollTrigger);
+
+      // Animate feature cards on scroll
+      const featureCards = document.querySelectorAll(".feature-card");
+      featureCards.forEach((card) => {
+        ScrollTrigger.create({
+          trigger: card,
+          start: "top bottom-=100px",
+          onEnter: () => card.classList.add("visible"),
+          once: true,
+        });
+      });
+    </script>
+
+    <script>
+        // Disable right-click
+        document.addEventListener('contextmenu', function (e) {
+          e.preventDefault();
+        });
+      
+        // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+        document.addEventListener('keydown', function (e) {
+          if (
+            e.key === "F12" || 
+            (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J")) || 
+            (e.ctrlKey && e.key === "U") || 
+            (e.ctrlKey && e.shiftKey && e.key === "C")
+          ) {
+            e.preventDefault();
+          }
+        });
+      </script>
+  </body>
+</html>

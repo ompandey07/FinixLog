@@ -10,7 +10,8 @@ from django.urls import path
 urlpatterns = [
     
     
-    path('', views.login_page , name="login_page"),
+    path('', views.home_view , name="home_view"),
+    path('easy_logs_login_view/', views.login_page , name="login_page"),
 
 
     # admin & admin controls 
