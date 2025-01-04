@@ -37,8 +37,9 @@
         );
       }
 
-      /* Preloader */
+      /* Hide preloader by default */
       .preloader {
+        display: none;
         position: fixed;
         top: 0;
         left: 0;
@@ -50,6 +51,10 @@
         align-items: center;
         z-index: 9999;
         backdrop-filter: blur(10px);
+      }
+
+      .preloader.active {
+        display: flex; /* Show only when necessary */
       }
 
       .spinner {
@@ -65,7 +70,6 @@
         0% {
           transform: rotate(0deg);
         }
-
         100% {
           transform: rotate(360deg);
         }
@@ -216,11 +220,11 @@
               <i class="ri-home-3-line mr-2"></i> Return Home
             </a>
             <a
-              href="https://workingonit.netlify.app/"
+              href="https://www.megaminds.com.np/"
               target="_blank"
               class="text-blue-500 hover:text-blue-600 flex items-center"
             >
-              <i class="ri-user-add-line mr-2"></i> Become a Member
+            <i class="ri-phone-line mr-2"></i> Contact Us 
             </a>
           </div>
         </form>
@@ -231,14 +235,31 @@
       // Show preloader only once when the page loads
       window.addEventListener("load", function () {
         const preloader = document.getElementById("preloader");
-        document.body.style.overflow = "hidden";
 
-        // Hide preloader after 2 seconds
-        setTimeout(() => {
-          preloader.style.opacity = "0";
-          document.body.style.overflow = "";
-          setTimeout(() => (preloader.style.display = "none"), 300);
-        }, 2000);
+        // Check if the preloader should be displayed
+        const isFirstLoad = !localStorage.getItem("hasVisited");
+
+        if (isFirstLoad) {
+          // Show preloader
+          preloader.classList.add("active");
+          document.body.style.overflow = "hidden";
+
+          // Hide preloader after 2 seconds
+          setTimeout(() => {
+            preloader.style.opacity = "0";
+            document.body.style.overflow = "";
+            setTimeout(() => {
+              preloader.style.display = "none";
+              preloader.classList.remove("active");
+            }, 300);
+          }, 2000);
+
+          // Mark the site as visited in localStorage
+          localStorage.setItem("hasVisited", "true");
+        } else {
+          // Ensure preloader is hidden
+          preloader.style.display = "none";
+        }
       });
 
       function togglePasswordVisibility() {
@@ -263,23 +284,23 @@
           submitButton.classList.add("opacity-75");
         });
     </script>
-       <script>
-        // Disable right-click
-        document.addEventListener('contextmenu', function (e) {
+    <script>
+      // Disable right-click
+      document.addEventListener("contextmenu", function (e) {
+        e.preventDefault();
+      });
+
+      // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+      document.addEventListener("keydown", function (e) {
+        if (
+          e.key === "F12" ||
+          (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J")) ||
+          (e.ctrlKey && e.key === "U") ||
+          (e.ctrlKey && e.shiftKey && e.key === "C")
+        ) {
           e.preventDefault();
-        });
-      
-        // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
-        document.addEventListener('keydown', function (e) {
-          if (
-            e.key === "F12" || 
-            (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J")) || 
-            (e.ctrlKey && e.key === "U") || 
-            (e.ctrlKey && e.shiftKey && e.key === "C")
-          ) {
-            e.preventDefault();
-          }
-        });
-      </script>
+        }
+      });
+    </script>
   </body>
 </html>
