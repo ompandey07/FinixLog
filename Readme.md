@@ -1,7 +1,7 @@
 
-# **EasyLogs** A Django-Based Business Management System 
+# **FinixLog** A Django-Based Business Management System 
 Created by :  <a href="https://www.omkumarpandey.com.np/" target="_blank">Om Pandey</a>
-EasyLogs is a comprehensive business management system designed to streamline inquiry and cheque management processes using Django, a high-level Python web framework. This system leverages Django's robust features to enhance operational efficiency and user experience.
+FinixLog is a comprehensive business management system designed to streamline inquiry and cheque management processes using Django, a high-level Python web framework. This system leverages Django's robust features to enhance operational efficiency and user experience.
 
 ---
 
@@ -74,7 +74,7 @@ EasyLogs is a comprehensive business management system designed to streamline in
 
 ## **Installation Guide**
 
-To set up EasyLogs on your local machine:
+To set up FinixLog on your local machine:
 
 ### Prerequisites
 - Python 3.8 or above
@@ -83,8 +83,8 @@ To set up EasyLogs on your local machine:
 ### Steps:
 ```bash
 # Clone the repository
-git clone https://github.com/ompandey07/EASYLOGS
-cd EASYLOGS
+git clone https://github.com/ompandey07/FinixLog
+cd FinixLog
 
 # Create a virtual environment
 python -m venv venv
@@ -204,12 +204,12 @@ After running the above commands, you can access the application at `http://127.
 
 ## **Contributing**
 
-We welcome contributions to EasyLogs! To get started, please follow these steps:
+We welcome contributions to FinixLog! To get started, please follow these steps:
 
 1. Fork the repository by clicking the "Fork" button on the GitHub page.
 2. Clone your forked repository to your local machine:
    ```bash
-   git clone https://github.com/your-username/EASYLOGS
+   git clone https://github.com/your-username/FinixLog
    ```
 3. Create a new branch for your feature:
    ```bash
