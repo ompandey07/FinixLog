@@ -15,6 +15,9 @@ from django.core.files.storage import FileSystemStorage
 from .utils import create_log
 from django.contrib.auth.models import User
 from django.views.decorators.http import require_http_methods
+from django.utils.timezone import now
+import subprocess
+import traceback
 
 
 
@@ -664,23 +667,54 @@ def user_profile(request):
 # View for database backup
 def backup_database(request):
     if request.method == 'POST':
-        database_path = settings.DATABASES['default']['NAME']
-        backup_dir = os.path.join(settings.MEDIA_ROOT, 'backups')
-        if not os.path.exists(backup_dir):
-            os.makedirs(backup_dir)
+        try:
+            # Define paths for the database and backups directory
+            database_path = settings.DATABASES['default']['NAME']
+            backup_dir = os.path.join(settings.MEDIA_ROOT, 'backups')
+            
+            # Create the backups directory if it doesn't exist
+            if not os.path.exists(backup_dir):
+                os.makedirs(backup_dir)
 
-        timestamp = timezone.now().strftime('%Y%m%d%H%M%S')
-        backup_filename = f"backup_{timestamp}.sqlite3"
-        backup_path = os.path.join(backup_dir, backup_filename)
+            # Generate a unique filename with a timestamp
+            timestamp = timezone.now().strftime('%Y%m%d%H%M%S')
+            backup_filename = f"backup_{timestamp}.dump"
+            backup_path = os.path.join(backup_dir, backup_filename)
 
-        shutil.copy2(database_path, backup_path)
+            # Use pg_dump to create a PostgreSQL backup
+            db_name = settings.DATABASES['default']['NAME']
+            db_user = settings.DATABASES['default']['USER']
+            db_password = settings.DATABASES['default']['PASSWORD']
+            db_host = settings.DATABASES['default']['HOST']
+            db_port = settings.DATABASES['default']['PORT']
 
-        if os.path.exists(backup_path):
-            create_log(f"backup created successfully  ", request.user)
-            return JsonResponse({"message": "Database backup created successfully.", "backup_filename": backup_filename})
-        else:
-            create_log(f"Failed to create a backup  ", request.user)
-            return JsonResponse({"message": "Failed to create a backup."}, status=500)
+            # Set environment variable for PostgreSQL password
+            os.environ['PGPASSWORD'] = db_password
+
+            # Run the pg_dump command
+            command = [
+                'pg_dump',
+                '-h', db_host,
+                '-p', str(db_port),
+                '-U', db_user,
+                '-F', 'c',  # Create a custom-format dump
+                '-f', backup_path,
+                db_name,
+            ]
+            subprocess.run(command, check=True)
+
+            # Confirm that the backup file was created
+            if os.path.exists(backup_path):
+                create_log(f"Backup created successfully: {backup_filename}", request.user)
+                return JsonResponse({"message": "Database backup created successfully.", "backup_filename": backup_filename})
+            else:
+                create_log("Failed to create a backup.", request.user)
+                return JsonResponse({"message": "Failed to create a backup."}, status=500)
+        except Exception as e:
+            # Handle errors and log them
+            error_message = str(e)
+            create_log(f"Backup failed: {error_message}", request.user)
+            return JsonResponse({"message": error_message}, status=500)
 
     return JsonResponse({"message": "Invalid request method."}, status=400)
 
@@ -691,20 +725,47 @@ def backup_database(request):
 # View for database restoration
 def restore_database(request):
     if request.method == 'POST' and request.FILES.get('backup_file'):
-        backup_file = request.FILES['backup_file']
-        database_path = settings.DATABASES['default']['NAME']
-        fs = FileSystemStorage()
-        temp_backup_path = fs.save(backup_file.name, backup_file)
-        temp_backup_full_path = fs.path(temp_backup_path)
+        try:
+            backup_file = request.FILES['backup_file']
+            fs = FileSystemStorage()
+            temp_backup_path = fs.save(backup_file.name, backup_file)
+            temp_backup_full_path = fs.path(temp_backup_path)
 
-        if os.path.exists(temp_backup_full_path):
-            os.replace(temp_backup_full_path, database_path)
-            create_log(f"Database restored successfully  ", request.user)
+            # PostgreSQL credentials
+            db_name = settings.DATABASES['default']['NAME']
+            db_user = settings.DATABASES['default']['USER']
+            db_password = settings.DATABASES['default']['PASSWORD']
+            db_host = settings.DATABASES['default']['HOST']
+            db_port = settings.DATABASES['default']['PORT']
+
+            # Set environment variable for password
+            os.environ['PGPASSWORD'] = db_password
+
+            # Use pg_restore to restore the database
+            command = [
+                'pg_restore',
+                '-h', db_host,
+                '-p', str(db_port),
+                '-U', db_user,
+                '-d', db_name,
+                '-c',  # Drop existing objects before restoring
+                temp_backup_full_path,
+            ]
+            result = subprocess.run(command, check=True, capture_output=True, text=True)
+
+            # Log success
+            create_log("Database restored successfully.", request.user)
             return JsonResponse({"message": "Database restored successfully."})
-        else:
-            create_log(f"Backup file not found.  ", request.user)
-            return JsonResponse({"message": "Backup file not found."}, status=404)
-
+        except subprocess.CalledProcessError as e:
+            # Log subprocess errors
+            error_message = f"Subprocess error: {e.stderr or e.output}"
+            create_log(error_message, request.user)
+            return JsonResponse({"message": error_message}, status=500)
+        except Exception as e:
+            # Log unexpected errors
+            error_message = f"Unexpected error: {str(e)}\n{traceback.format_exc()}"
+            create_log(error_message, request.user)
+            return JsonResponse({"message": error_message}, status=500)
     return JsonResponse({"message": "No file uploaded or invalid request."}, status=400)
 
 

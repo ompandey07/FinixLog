@@ -4,3 +4,6 @@
 
 # Ignore SQLite database
 db.sqlite3
+
+# Ignore settings of respetive user 
+/FinixLog/settings.py

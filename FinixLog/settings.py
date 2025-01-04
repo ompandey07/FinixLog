@@ -26,7 +26,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'  # Directory where static files will be c
 
 # Media files settings
 MEDIA_URL = '/media/'  # URL to access media files in the browser
-MEDIA_ROOT = BASE_DIR / 'mediafiles'  # Directory to store user-uploaded media files
+MEDIA_ROOT = BASE_DIR / 'media'  # Directory to store user-uploaded media files
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-_2vcrf_j53p%%b3(j5j$)zyz)#8j%$rmo@5#1nj0^d_u-)k@51'
@@ -93,10 +93,25 @@ WSGI_APPLICATION = 'FinixLog.wsgi.application'
 #     }
 # }
 
+
+# Default Sqlite Setting Uncomment If You Need 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',  # This is correct if BASE_DIR is a Path object
+#     }
+# }
+
+
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',  # This is correct if BASE_DIR is a Path object
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'FinixLogs',
+        'USER': 'postgres',
+        'PASSWORD': 'admin@1200',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
