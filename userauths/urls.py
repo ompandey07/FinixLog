@@ -9,9 +9,10 @@ from django.urls import path
 
 urlpatterns = [
     
-    
+    # Home & Login Page
     path('', views.home_view , name="home_view"),
     path('easy_logs_login_view/', views.login_page , name="login_page"),
+    path('logout/', views.logout_view, name='logout'),
 
 
     # admin & admin controls 
@@ -23,7 +24,6 @@ urlpatterns = [
     path('inquiry_status/', views.inquiry_status , name="inquiry_status"),
     path('update_inquiry/<int:inquiry_id>/', views.update_inquiry, name='update_inquiry'),
     path('update_inquiry_status/<int:inquiry_id>/', views.update_inquiry_status, name='update_inquiry_status'),
-
     path('add_cheque/', views.add_cheque , name="add_cheque"),
     path('due_cheque_reports/', views.cheque_reports , name="due_cheque_reports"),
     path('pending_cheque_reports/', views.pending_cheque_reports , name="pending_cheque_reports"),
@@ -37,7 +37,6 @@ urlpatterns = [
     path('update_employee/<int:employee_id>/', views.update_employee, name='update_employee'),
     path('delete_employee/<int:employee_id>/', views.delete_employee, name='delete_employee'),
 
-    path('logout/', views.logout_view, name='logout'),
 
 
 
