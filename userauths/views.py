@@ -44,14 +44,9 @@ def prevent_admin_access(view_func):
 
 
 #? -------------------------------------------------------------------------------------------------------------------------------------------------------
+# Function to show the home page
 def home_view (request):
     return render(request, "MainPage.html")
-
-
-
-
-
-
 
 
 
