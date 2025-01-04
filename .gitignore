@@ -1,6 +1,10 @@
 /venv/
 /world/
 
+/media/
+/static/
+
+
 
 # Ignore SQLite database
 db.sqlite3
