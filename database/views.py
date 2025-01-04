@@ -207,7 +207,7 @@ def blog_view(request):
         'description': post.content[:200] + '...' if len(post.content) > 200 else post.content,
         'category': post.category,
         'date': post.created_at.isoformat(),  # Convert datetime to ISO format string
-        'image': post.image.url if post.image else 'https://placehold.co/800x600/png',
+        'image': post.image.url if post.image else 'https://media.istockphoto.com/id/1180410208/vector/landscape-image-gallery-with-the-photos-stack-up.jpg?s=612x612&w=0&k=20&c=G21-jgMQruADLPDBk7Sf1vVvCEtPiJD3Rf39AeB95yI=',
     } for post in current_posts]
     
     # Serialize the data
